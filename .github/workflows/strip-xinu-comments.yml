@@ -1,0 +1,33 @@
+name: Strip non-legal XINU comments
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/strip-xinu-comments.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  strip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out OSSD Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove non-legal source comments
+        run: python3 .github/scripts/strip_xinu_comments.py
+      - name: Commit cleaned source
+        run: |
+          if git diff --quiet -- XINU; then
+            echo "No removable comments found."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add XINU
+          git commit -m "Remove non-legal comments from XINU source"
+          git push
