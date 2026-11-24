@@ -97,30 +97,11 @@ typedef int                     integer_t;
                                            
                                               
    
-#ifdef __LP64__
+/* Kernel virtual addresses and sizes are pointer-width on supported ABIs. */
 typedef uintptr_t               vm_offset_t;
-#else                 
-typedef natural_t               vm_offset_t;
-#endif                
 
-  
-                                          
-                                        
-                        
-   
-#ifdef __LP64__
 typedef uintptr_t               vm_size_t;
-#else                 
-typedef natural_t               vm_size_t;
-#endif                
 
-  
-                                                        
-                                                         
-                                                      
-                                                       
-                               
-   
 typedef uint64_t                mach_vm_address_t;
 typedef uint64_t                mach_vm_offset_t;
 typedef uint64_t                mach_vm_size_t;
