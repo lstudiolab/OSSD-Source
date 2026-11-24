@@ -81,6 +81,9 @@ osfmk/i386/mp_native.c		standard
 
 osfmk/i386/acpi.c		standard
 
+# OSSD x86-64 PCI Configuration Mechanism #1 backend
+osfmk/i386/ossd_pci_x86.c	standard
+
 osfmk/i386/mtrr.c		optional    config_mtrr
 
 osfmk/kdp/ml/x86_64/kdp_machdep.c	optional	mach_kdp
