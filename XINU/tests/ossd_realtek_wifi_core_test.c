@@ -84,6 +84,18 @@ int main(void)
 	assert(dev.state == OSSD_RTW_STATE_FAILED);
 	assert(m.calls == 5 + 100 + 1000);
 
+	/* Missing data-plane operations must prevent a false RUNNING state. */
+	{
+		struct ossd_rtw_backend_ops incomplete = ops;
+		incomplete.scan = 0;
+		dev.ops = &incomplete;
+		dev.state = OSSD_RTW_STATE_MATCHED;
+		m.calls = 0;
+		assert(ossd_rtw_device_start(&dev) == -3);
+		assert(m.calls == 0);
+		dev.ops = &ops;
+	}
+
 	/* Missing firmware metadata must fail before claiming hardware. */
 	{
 		const struct ossd_rtw_firmware_manifest *saved = dev.firmware;
