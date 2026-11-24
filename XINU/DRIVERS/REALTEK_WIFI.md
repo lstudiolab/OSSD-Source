@@ -152,6 +152,16 @@ permission, and required path. Only redistribute blobs whose license permits
 it. If redistribution is not permitted, document a user-supplied firmware
 installation path and fail clearly when the blob is missing.
 
+A viable firmware source has now been identified: the pinned linux-firmware
+WHENCE inventory lists the RTW88 firmware set (including RTL8821C and RTL8822C)
+as redistributable under `LICENCE.rtlwifi_firmware.txt`. That license requires
+the copyright notice and disclaimer to accompany binary redistribution,
+prohibits endorsement using Realtek's name without permission, and prohibits
+reverse engineering/decompilation/disassembly of the firmware binary. OSSD has
+not yet imported or pinned any firmware blob, verified its SHA-256, or added
+the required license notice to a firmware package; firmware loading therefore
+remains disabled until those steps are completed.
+
 Do not copy GPL-licensed Linux driver code into the XNU-derived source tree
 without a deliberate licensing review. Prefer a clean-room XINU-native
 implementation based on public hardware documentation and legally usable
