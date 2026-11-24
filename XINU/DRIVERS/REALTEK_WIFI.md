@@ -2,7 +2,7 @@
 
 ## Status
 
-**Planned; no Realtek Wi-Fi chipset is currently verified as supported by XINU.**
+**Experimental foundation; no Realtek Wi-Fi chipset is currently verified as functionally supported by XINU.**
 This document is the implementation contract and coverage inventory. A PCI/USB
 ID match, firmware file being present, or a successful compile is not evidence
 of working Wi-Fi.
@@ -26,6 +26,19 @@ universal register protocol.
 This is a family-level target list, not a claim that every transport or
 subsystem variant is supported. Each exact chip/transport/revision combination
 must have its own match record and test status.
+
+## Implemented in XINU source
+
+- `osfmk/device/ossd_realtek_wifi.h` defines family identifiers and the PCI
+  candidate-match record.
+- `osfmk/device/ossd_realtek_wifi.c` matches selected Realtek PCIe IDs and
+  rejects non-network PCI class devices. Subsystem wildcard support is present.
+- The module is included in the Mach source manifest and exported device
+  headers. A host regression test checks positive and negative matches.
+- The PCI ID table is a candidate inventory based on public hardware ID
+  references; it is not an initialized device driver. USB and SDIO matching,
+  firmware, register operations, DMA, interrupts, and network attachment remain
+  unimplemented.
 
 ## Required XINU interfaces
 
@@ -95,11 +108,11 @@ Never promote an entire family to supported based on one device.
 
 | Family / variant | Bus | Status | Evidence |
 |---|---|---|---|
-| RTL8188 / RTL8192 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
-| RTL8723 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
-| RTL8812 / RTL8814 variants | PCIe / USB | planned | No XINU driver or hardware test |
-| RTL8821 / RTL8822 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
-| RTL8851B / RTL8852 variants | PCIe / USB | planned | No XINU driver or hardware test |
+| RTL8188 / RTL8192 PCIe IDs listed in source | PCIe | experimental matching only | Match regression test; no hardware initialization |
+| RTL8723 PCIe IDs listed in source | PCIe | experimental matching only | Match regression test; no hardware initialization |
+| RTL8812 / RTL8814 PCIe variants | PCIe | planned | Not all PCI IDs mapped; no hardware test |
+| RTL8821 / RTL8822 PCIe variants | PCIe | experimental matching only | Match regression test; no hardware initialization |
+| RTL8851B / RTL8852 variants | PCIe / USB | planned | Candidate IDs only; no hardware initialization |
 | RTL8922 variants | PCIe / USB | planned | No XINU driver or hardware test |
 
 ## Laptop validation
@@ -122,3 +135,14 @@ database, not only one laptop.
 
 These are research references only. Their code and APIs are not XINU driver
 implementations, and their licensing must be reviewed independently.
+
+
+## Match-table references
+
+The initial PCI identifiers are cross-checked against public PCI ID and
+wireless-driver hardware tables. References are used for identification only;
+no Linux driver source is imported into XINU:
+
+- https://cateee.net/lkddb/web-lkddb/RTW88.html
+- https://cateee.net/lkddb/web-lkddb/RTL8192CE.html
+- https://wireless.docs.kernel.org/en/latest/en/users/drivers/rtl819x.html
