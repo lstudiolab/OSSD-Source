@@ -134,11 +134,14 @@ mock_mmio_unmap(void *context, volatile void *virtual_address,
 static uint32_t msi_config[1024];
 static int msi_allocations;
 static int msi_releases;
+static int msi_out_of_range_reads;
+static uint64_t msi_alloc_address = 0xfee00000ULL;
 static uint32_t
 msi_read(void *context, uint8_t bus, uint8_t device, uint8_t function,
     uint16_t offset)
 {
 	(void)context; (void)bus; (void)device; (void)function;
+	if (offset > 0xffU) msi_out_of_range_reads++;
 	if (offset >= sizeof(msi_config)) return 0xffffffffU;
 	return msi_config[offset / 4U];
 }
@@ -155,7 +158,7 @@ msi_allocate(void *context, struct ossd_pci_msi_message *message)
 {
 	(void)context;
 	msi_allocations++;
-	message->address = 0xfee00000ULL;
+	message->address = msi_alloc_address;
 	message->data = 0x45U;
 	message->provider_cookie = &msi_config;
 	return 0;
@@ -164,7 +167,7 @@ static void
 msi_release(void *context, const struct ossd_pci_msi_message *message)
 {
 	(void)context;
-	assert(message->address == 0xfee00000ULL);
+	assert(message->address == msi_alloc_address);
 	assert(message->data == 0x45U);
 	msi_releases++;
 }
@@ -355,6 +358,65 @@ main(void)
 		assert(msi_config[0x58 / 4] == 0x55667788U);
 		assert(msi_config[0x5c / 4] == 0x00000099U);
 		assert((msi_config[0x04 / 4] & 0xffffU) == 0x0006U);
+	}
+
+	/* 32-bit MSI rejects >4-GiB routes and restores message state. */
+	{
+		const struct ossd_pci_msi_provider_ops provider = {
+			.allocate = msi_allocate, .release = msi_release
+		};
+		struct ossd_pci_device d;
+		struct ossd_pci_msi_state state;
+		memset(&d, 0, sizeof(d));
+		memset(&state, 0, sizeof(state));
+		memset(msi_config, 0, sizeof(msi_config));
+		d.vendor_id = 0x8086; d.device_id = 0x1234;
+		d.device = 1; d.function = 0; d.header_type = 0;
+		msi_config[0x00 / 4] = 0x12348086U;
+		msi_config[0x04 / 4] = 0x00100006U;
+		msi_config[0x34 / 4] = 0x50U;
+		msi_config[0x50 / 4] = 0x00000005U; /* 32-bit, no mask */
+		msi_config[0x54 / 4] = 0x12340000U;
+		msi_config[0x58 / 4] = 0x00000099U;
+		msi_allocations = msi_releases = 0;
+		msi_alloc_address = 0x1fee00000ULL;
+		assert(ossd_pci_msi_enable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &state) == -6);
+		assert(msi_allocations == 1 && msi_releases == 1);
+		assert(msi_config[0x54 / 4] == 0x12340000U);
+		msi_alloc_address = 0xfee00000ULL;
+		assert(ossd_pci_msi_enable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &state) == 0);
+		assert(msi_config[0x54 / 4] == 0xfee00000U);
+		assert(msi_config[0x58 / 4] == 0x45U);
+		ossd_pci_msi_disable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &state);
+		assert(msi_config[0x54 / 4] == 0x12340000U);
+		assert(msi_config[0x58 / 4] == 0x99U);
+		assert(msi_releases == 2);
+	}
+
+	/* Malformed 64-bit MSI capability at 0xfc must not read beyond config space. */
+	{
+		const struct ossd_pci_msi_provider_ops provider = {
+			.allocate = msi_allocate, .release = msi_release
+		};
+		struct ossd_pci_device d;
+		struct ossd_pci_msi_state state;
+		memset(&d, 0, sizeof(d));
+		memset(&state, 0, sizeof(state));
+		memset(msi_config, 0, sizeof(msi_config));
+		d.vendor_id = 0x8086; d.device_id = 0x1234;
+		d.device = 1; d.function = 0; d.header_type = 0;
+		msi_config[0x00 / 4] = 0x12348086U;
+		msi_config[0x04 / 4] = 0x00100006U;
+		msi_config[0x34 / 4] = 0xfcU;
+		msi_config[0xfc / 4] = 0x01800005U;
+		msi_out_of_range_reads = 0;
+		msi_alloc_address = 0xfee00000ULL;
+		assert(ossd_pci_msi_enable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &state) == -7);
+		assert(msi_out_of_range_reads == 0);
 	}
 
 	/* BAR mapper and bounded MMIO accessors reject invalid register offsets. */
