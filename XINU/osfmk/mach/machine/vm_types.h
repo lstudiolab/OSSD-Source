@@ -30,12 +30,19 @@
 #ifndef _MACH_MACHINE_VM_TYPES_H_
 #define _MACH_MACHINE_VM_TYPES_H_
 
-#if defined (__i386__) || defined(__x86_64__)
+/*
+ * OSSD kernel ABI policy: 32-bit x86 and 32-bit ARM are not supported.
+ * The i386 directory name is retained upstream for shared x86-64 headers;
+ * it does not enable a 32-bit kernel build.
+ */
+#if defined(__i386__) || (defined(__arm__) && !defined(__arm64__) && !defined(__aarch64__))
+#error "OSSD XCU supports 64-bit kernel targets only (x86_64 and arm64)"
+#elif defined(__x86_64__)
 #include "mach/i386/vm_types.h"
-#elif defined (__arm__) || defined (__arm64__)
+#elif defined(__arm64__) || defined(__aarch64__)
 #include "mach/arm/vm_types.h"
 #else
-#error architecture not supported
+#error "OSSD XCU supports only x86_64 and arm64"
 #endif
 
 #endif                                
