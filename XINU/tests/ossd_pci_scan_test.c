@@ -105,6 +105,31 @@ bar_write(void *context, uint8_t bus, uint8_t device, uint8_t function,
 	}
 }
 
+
+static uint32_t mmio_storage[16];
+static int mmio_map_calls;
+static int mmio_unmap_calls;
+static int
+mock_mmio_map(void *context, uint64_t physical, uint64_t length,
+    volatile void **virtual_address)
+{
+	(void)context;
+	assert(physical == 0xfebf0000ULL);
+	assert(length == 0x10000ULL);
+	mmio_map_calls++;
+	*virtual_address = mmio_storage;
+	return 0;
+}
+static void
+mock_mmio_unmap(void *context, volatile void *virtual_address,
+    uint64_t length)
+{
+	(void)context;
+	assert(virtual_address == mmio_storage);
+	assert(length == 0x10000ULL);
+	mmio_unmap_calls++;
+}
+
 struct test_state {
 	uint32_t count;
 	int found_network;
@@ -225,6 +250,37 @@ main(void)
 		assert(bar_low == 0x0000000cU && bar_high == 0x00000012U);
 		assert(bar_command == 0x0007U && bar_writes == 6);
 		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 6, &info) == -1);
+	}
+
+
+	/* BAR mapper and bounded MMIO accessors reject invalid register offsets. */
+	{
+		const struct ossd_pci_mmio_ops ops = {
+			.map = mock_mmio_map, .unmap = mock_mmio_unmap
+		};
+		struct ossd_pci_device d;
+		struct ossd_pci_mmio_region region;
+		uint32_t value = 0;
+		memset(&d, 0, sizeof(d));
+		memset(mmio_storage, 0, sizeof(mmio_storage));
+		d.header_type = 0;
+		d.device = 1;
+		d.function = 0;
+		bar_command = 0x0007U;
+		bar_low = 0xfebf0000U;
+		bar_mask_low = 0xffff0000U;
+		bar_sizing = 0;
+		mmio_map_calls = mmio_unmap_calls = 0;
+		assert(ossd_pci_map_bar(bar_read, bar_write, 0, &d, 0, 0x1000,
+		    &ops, 0, &region) == 0);
+		assert(mmio_map_calls == 1 && region.length == 0x10000ULL);
+		assert(ossd_pci_mmio_write32(&region, 4, 0x12345678U) == 0);
+		assert(ossd_pci_mmio_read32(&region, 4, &value) == 0);
+		assert(value == 0x12345678U);
+		assert(ossd_pci_mmio_read32(&region, 62, &value) == -1);
+		assert(ossd_pci_mmio_write16(&region, 3, 0x1234U) == -1);
+		ossd_pci_unmap_bar(&ops, 0, &region);
+		assert(mmio_unmap_calls == 1 && region.base == 0);
 	}
 
 	puts("XINU PCI and ECAM enumeration tests passed");
