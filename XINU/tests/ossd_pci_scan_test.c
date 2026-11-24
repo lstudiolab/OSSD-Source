@@ -283,6 +283,11 @@ main(void)
 		bar_mask_high = 0;
 		bar_sizing = 0;
 		bar_writes = 0;
+		/* Stale identity records are rejected before any config writes. */
+		d.device_id = 0x9999;
+		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info) == -2);
+		assert(bar_writes == 0);
+		d.device_id = 0x1234;
 		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info) == 0);
 		assert(info.type == OSSD_PCI_BAR_MEMORY && !info.is_64_bit);
 		assert(info.address == 0xfebf0000ULL && info.size == 0x10000ULL);
