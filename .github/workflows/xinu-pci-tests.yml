@@ -15,7 +15,9 @@ on:
       - "XINU/osfmk/device/ossd_pci.*"
       - "XINU/tests/ossd_pci_scan_test.c"
       - "XINU/osfmk/device/ossd_realtek_wifi.*"
+      - "XINU/osfmk/device/ossd_realtek_wifi_core.*"
       - "XINU/tests/ossd_realtek_wifi_match_test.c"
+      - "XINU/tests/ossd_realtek_wifi_core_test.c"
       - ".github/workflows/xinu-pci-tests.yml"
   workflow_dispatch:
 
