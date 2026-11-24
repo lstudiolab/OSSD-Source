@@ -354,9 +354,12 @@ main(void)
 		struct ossd_pci_device d;
 		struct ossd_pci_mmio_region region;
 		uint32_t value = 0;
+		uint16_t value16 = 0;
 		memset(&d, 0, sizeof(d));
 		memset(mmio_storage, 0, sizeof(mmio_storage));
 		d.header_type = 0;
+		d.vendor_id = 0x8086;
+		d.device_id = 0x1234;
 		d.device = 1;
 		d.function = 0;
 		bar_command = 0x0007U;
@@ -374,7 +377,7 @@ main(void)
 		assert(ossd_pci_mmio_write16(&region, 3, 0x1234U) == -1);
 		/* A misaligned mapping base is rejected even at offset zero. */
 		region.base = (volatile uint8_t *)mmio_storage + 1;
-		assert(ossd_pci_mmio_read16(&region, 0, (uint16_t *)&value) == -1);
+		assert(ossd_pci_mmio_read16(&region, 0, &value16) == -1);
 		region.base = (volatile uint8_t *)mmio_storage;
 		ossd_pci_unmap_bar(&ops, 0, &region);
 		assert(mmio_unmap_calls == 1 && region.base == 0);
