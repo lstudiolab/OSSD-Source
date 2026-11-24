@@ -28,7 +28,7 @@ enum ossd_rtw_state {
 /*
  * Bus/chipset-specific implementations supply these operations. All methods
  * return 0 on success and a negative errno-style value on failure. Firmware
- * bytes are authenticated by the verifier before claim/reset/load; the loader
+ * bytes are authenticated by the in-tree SHA-256 verifier before claim/reset/load; the loader
  * must still enforce the chipset's bounded transfer protocol and timeouts.
  */
 struct ossd_rtw_backend_ops {
