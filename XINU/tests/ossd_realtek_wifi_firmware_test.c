@@ -11,6 +11,7 @@ int main(void)
 {
 	const char blob[] = "wifi";
 	const char abc[] = "abc";
+	char boundary[100];
 	const struct ossd_rtw_match match = {
 		OSSD_RTW_TRANSPORT_PCIE, OSSD_RTW_FAMILY_RTW88,
 		"RTL8821CE", "rtl8821ce.bin"
@@ -24,6 +25,13 @@ int main(void)
 		OSSD_RTW_FIRMWARE_USER_SUPPLIED
 	};
 
+	memset(boundary, 'a', sizeof(boundary));
+	assert(ossd_rtw_sha256_verify(0, boundary, 55,
+	    "9f4390f8d30c2dd92ec9f095b65e2b9ae9b0a925a5258e241c9f1e910f734318") == 0);
+	assert(ossd_rtw_sha256_verify(0, boundary, 56,
+	    "b35439a4ac6f0948b6d6f9e3c6af0f5f590ce20f1bde7090ef7970686ec6738a") == 0);
+	assert(ossd_rtw_sha256_verify(0, boundary, sizeof(boundary),
+	    "2816597888e4a0d3a36b82b83316ab32680eb8f00f8cd3b904d681246d285a0e") == 0);
 	assert(ossd_rtw_sha256_verify(0, abc, sizeof(abc) - 1,
 	    "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad") == 0);
 	assert(ossd_rtw_sha256_verify(0, 0, 0,
