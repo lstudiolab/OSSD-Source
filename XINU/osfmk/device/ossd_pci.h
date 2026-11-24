@@ -45,9 +45,11 @@ typedef void (*ossd_pci_device_fn)(
 uint32_t ossd_pci_scan(ossd_pci_config_read_fn read_config,
     void *read_context, ossd_pci_device_fn found, void *found_context);
 
+#if defined(__x86_64__)
 /* x86 legacy PCI Configuration Mechanism #1 backend. */
 uint32_t ossd_pci_platform_enumerate(ossd_pci_device_fn found,
     void *found_context);
+#endif
 
 #ifdef __cplusplus
 }
