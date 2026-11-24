@@ -10,7 +10,19 @@ struct mock { int calls; int fail_at; };
 static int step(struct mock *m) { m->calls++; return m->calls == m->fail_at ? -5 : 0; }
 static int claim(void *p) { return step(p); }
 static int reset(void *p) { return step(p); }
-static int firmware(void *p, const char *name) { assert(name != 0); return step(p); }
+static int verify(void *p, const void *bytes, size_t length, const char *digest)
+{
+	(void)p;
+	assert(bytes != 0 && length == 4);
+	assert(strlen(digest) == OSSD_RTW_FIRMWARE_SHA256_HEX_LENGTH);
+	return 0;
+}
+static int firmware(void *p, const struct ossd_rtw_firmware_manifest *manifest,
+    const void *bytes, size_t length)
+{
+	assert(manifest != 0 && bytes != 0 && length == 4);
+	return step(p);
+}
 static int initialize(void *p, const struct ossd_rtw_match *m) { assert(m != 0); return step(p); }
 static int start(void *p) { return step(p); }
 static void stop(void *p) { ((struct mock *)p)->calls += 100; }
@@ -27,10 +39,29 @@ int main(void)
 	const struct ossd_rtw_match *sm = ossd_rtw_sdio_match_device(&sdio);
 	struct mock m = { 0, 0 };
 	const struct ossd_rtw_backend_ops ops = {
-		claim, reset, firmware, initialize, start, stop, release, transmit, scan
+		.claim = claim, .reset = reset, .verify_firmware = verify,
+		.load_firmware = firmware, .initialize = initialize, .start = start,
+		.stop = stop, .release = release, .transmit = transmit, .scan = scan
 	};
-	const struct ossd_rtw_match test_match = { OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "test-chip", "test-firmware.bin" };
-	struct ossd_rtw_device dev = { &test_match, &ops, &m, OSSD_RTW_STATE_MATCHED, 0, 0, 0 };
+	const struct ossd_rtw_match test_match = {
+		OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88,
+		"test-chip", "test-firmware.bin"
+	};
+	const struct ossd_rtw_firmware_manifest test_firmware = {
+		"test-firmware.bin", "test-chip",
+		"https://firmware.example.invalid/test-firmware.bin",
+		"LicenseRef-UserSupplied",
+		"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+		4, 1, 3, OSSD_RTW_FAMILY_RTW88, OSSD_RTW_TRANSPORT_USB,
+		OSSD_RTW_FIRMWARE_USER_SUPPLIED
+	};
+	const char firmware_bytes[] = "blob";
+	struct ossd_rtw_device dev = {
+		.match = &test_match, .firmware = &test_firmware,
+		.firmware_bytes = firmware_bytes, .firmware_length = sizeof(firmware_bytes) - 1,
+		.silicon_revision = 2, .ops = &ops, .backend_context = &m,
+		.state = OSSD_RTW_STATE_MATCHED
+	};
 	char frame[64] = { 0 };
 
 	assert(um && um->family == OSSD_RTW_FAMILY_RTW88);
@@ -51,7 +82,6 @@ int main(void)
 	dev.state = OSSD_RTW_STATE_MATCHED;
 	assert(ossd_rtw_device_start(&dev) == -5);
 	assert(dev.state == OSSD_RTW_STATE_FAILED && dev.last_error == -5);
-	/* claim and reset completed, so failure unwound the claimed bus. */
 	assert(m.calls == 3 + 1000);
 
 	/* A failed start must invoke stop before releasing the transport. */
@@ -61,17 +91,27 @@ int main(void)
 	assert(dev.state == OSSD_RTW_STATE_FAILED);
 	assert(m.calls == 5 + 100 + 1000);
 
-	/* A missing firmware manifest must fail before claiming hardware. */
+	/* Missing firmware metadata must fail before claiming hardware. */
 	{
-		struct ossd_rtw_match no_firmware = {
-			OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "chip", 0
-		};
-		dev.match = &no_firmware;
+		const struct ossd_rtw_firmware_manifest *saved = dev.firmware;
+		dev.firmware = 0;
 		m.calls = 0; m.fail_at = 0;
 		dev.state = OSSD_RTW_STATE_MATCHED;
 		assert(ossd_rtw_device_start(&dev) == -3);
 		assert(m.calls == 0);
-		dev.match = &test_match;
+		dev.firmware = saved;
+	}
+	/* Digest rejection must also happen before hardware ownership. */
+	{
+		const struct ossd_rtw_backend_ops *saved = dev.ops;
+		struct ossd_rtw_backend_ops bad_ops = ops;
+		bad_ops.verify_firmware = 0;
+		dev.ops = &bad_ops;
+		m.calls = 0; m.fail_at = 0;
+		dev.state = OSSD_RTW_STATE_MATCHED;
+		assert(ossd_rtw_device_start(&dev) == -3);
+		assert(m.calls == 0);
+		dev.ops = saved;
 	}
 	return 0;
 }
