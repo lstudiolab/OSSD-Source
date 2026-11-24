@@ -124,6 +124,17 @@ struct ossd_pci_ecam_region {
 	uint8_t end_bus;
 };
 
+struct ossd_pci_ecam_access {
+	volatile uint8_t *mapped_base;
+	const struct ossd_pci_ecam_region *region;
+};
+
+/* ECAM configuration callbacks for x86-64 and arm64 platform providers. */
+uint32_t ossd_pci_ecam_config_read(void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset);
+void ossd_pci_ecam_config_write(void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset, uint32_t value);
+
 typedef void (*ossd_pci_device_fn)(
     void *context, const struct ossd_pci_device *device);
 
