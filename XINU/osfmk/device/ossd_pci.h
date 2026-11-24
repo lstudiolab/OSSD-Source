@@ -14,6 +14,7 @@ extern "C" {
 #define OSSD_PCI_MAX_BARS 6
 
 struct ossd_pci_device {
+	uint16_t segment;
 	uint8_t bus;
 	uint8_t device;
 	uint8_t function;
@@ -34,6 +35,13 @@ struct ossd_pci_device {
 typedef uint32_t (*ossd_pci_config_read_fn)(
     void *context, uint8_t bus, uint8_t device, uint8_t function,
     uint16_t offset);
+struct ossd_pci_ecam_region {
+	uint64_t base_address;
+	uint16_t segment;
+	uint8_t start_bus;
+	uint8_t end_bus;
+};
+
 typedef void (*ossd_pci_device_fn)(
     void *context, const struct ossd_pci_device *device);
 
@@ -43,7 +51,17 @@ typedef void (*ossd_pci_device_fn)(
  * registers. Returns the number of discovered functions.
  */
 uint32_t ossd_pci_scan(ossd_pci_config_read_fn read_config,
-    void *read_context, ossd_pci_device_fn found, void *found_context);
+    void *read_context, uint16_t segment, uint8_t first_bus, uint8_t last_bus,
+    ossd_pci_device_fn found, void *found_context);
+
+/*
+ * Scans an already-mapped PCIe ECAM region. mapped_base must map
+ * region->base_address for (end_bus - start_bus + 1) MiB with device-memory
+ * attributes. Mapping and ACPI MCFG/Device Tree discovery are platform work.
+ */
+uint32_t ossd_pci_scan_ecam(volatile void *mapped_base,
+    const struct ossd_pci_ecam_region *region, ossd_pci_device_fn found,
+    void *found_context);
 
 #if defined(__x86_64__)
 /* x86 legacy PCI Configuration Mechanism #1 backend. */
