@@ -178,3 +178,11 @@ the full kernel build, or physical hardware. Do not infer device support from th
 The imported XNU-derived source tree provides substantial kernel and I/O Kit
 infrastructure, but this does not establish complete PC driver coverage.
 Broad compatibility remains an implementation target, not a current claim.
+
+
+## Realtek Wi-Fi
+
+The chipset-family coverage target, XINU-native implementation prerequisites,
+firmware policy, bring-up sequence, and compatibility-state rules are tracked
+in [REALTEK_WIFI.md](REALTEK_WIFI.md). Realtek Wi-Fi is not yet implemented or
+verified; do not advertise it as supported until physical end-to-end tests pass.
