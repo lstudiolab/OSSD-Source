@@ -27,7 +27,8 @@ int main(void)
 {
 	const char blob[] = "wifi";
 	const struct ossd_rtw_match match = {
-		OSSD_RTW_TRANSPORT_PCIE, OSSD_RTW_FAMILY_RTW88, "RTL8821CE", 0
+		OSSD_RTW_TRANSPORT_PCIE, OSSD_RTW_FAMILY_RTW88,
+		"RTL8821CE", "rtl8821ce.bin"
 	};
 	struct ossd_rtw_firmware_manifest manifest = {
 		"rtl8821ce.bin", "RTL8821CE",
@@ -59,7 +60,11 @@ int main(void)
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1, verify_ok, 0) == -5);
 	manifest.transport = OSSD_RTW_TRANSPORT_PCIE;
-	manifest.sha256_hex = "not-a-sha256";
+	manifest.sha256_hex = "short";
+	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
+	    sizeof(blob) - 1, verify_ok, 0) == -2);
+	manifest.sha256_hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+	manifest.source_uri = "x";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1, verify_ok, 0) == -2);
 	return 0;
