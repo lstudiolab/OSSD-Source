@@ -11,6 +11,10 @@ on:
       - "XINU/osfmk/device/ossd_realtek_wifi_core.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_firmware.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_sha256.*"
+      - "XINU/Makefile"
+      - "XINU/osfmk/Makefile"
+      - "XINU/osfmk/mach/machine/vm_types.h"
+      - "XINU/osfmk/mach/i386/vm_types.h"
       - "XINU/osfmk/device/ossd_realtek_wifi_sha256.*"
       - "XINU/tests/ossd_realtek_wifi_match_test.c"
       - "XINU/tests/ossd_realtek_wifi_core_test.c"
@@ -36,6 +40,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Enforce 64-bit-only kernel architecture policy
+        run: |
+          ! grep -Eq '^(INSTINC_SUBDIRS|EXPINC_SUBDIRS|COMP_SUBDIRS|INSTTEXTFILES_SUBDIRS)_ARM[[:space:]]*=' XINU/Makefile
+          ! grep -Eq '^(INSTINC_SUBDIRS|EXPINC_SUBDIRS)_ARM[[:space:]]*=' XINU/osfmk/Makefile
+          grep -Fq '#error "OSSD XCU supports 64-bit kernel targets only (x86_64 and arm64)"' XINU/osfmk/mach/machine/vm_types.h
+          ! grep -q '#ifdef __LP64__' XINU/osfmk/mach/i386/vm_types.h
+          grep -Fq 'typedef uintptr_t               vm_offset_t;' XINU/osfmk/mach/i386/vm_types.h
+          grep -Fq 'typedef uintptr_t               vm_size_t;' XINU/osfmk/mach/i386/vm_types.h
       - name: Compile PCI scanner with warnings as errors
         run: |
           cc -std=c11 -Wall -Wextra -Werror \
