@@ -83,5 +83,11 @@ main(void)
 	    OSSD_DMA_TO_DEVICE, &mapping) == -1);
 	assert(ossd_dma_allocate(&ops, 0, 1024, 48, 0, 32,
 	    OSSD_DMA_TO_DEVICE, &mapping) == -1);
+	supplied_address = 0x200000ULL;
+	assert(ossd_dma_allocate(&ops, 0, 1024, 64, 0, 32,
+	    OSSD_DMA_TO_DEVICE, &mapping) == 0);
+	assert(ossd_dma_sync_for_cpu(&ops, 0, &mapping, 0, 64,
+	    OSSD_DMA_FROM_DEVICE) == -1);
+	ossd_dma_release(&ops, 0, &mapping);
 	return 0;
 }
