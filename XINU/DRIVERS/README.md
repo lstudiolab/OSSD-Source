@@ -184,6 +184,6 @@ Broad compatibility remains an implementation target, not a current claim.
 
 The chipset-family coverage target, XINU-native implementation prerequisites,
 firmware policy, bring-up sequence, and compatibility-state rules are tracked
-in [REALTEK_WIFI.md](REALTEK_WIFI.md). XINU now has an experimental PCIe ID
-matching module and host regression test, but no functional Realtek radio driver.
+in [REALTEK_WIFI.md](REALTEK_WIFI.md). XINU now has experimental PCIe/USB/SDIO candidate matching, a backend lifecycle
+contract, and host regression tests, but no functional Realtek radio driver.
 Do not advertise Wi-Fi as supported until physical end-to-end tests pass.
