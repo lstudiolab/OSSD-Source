@@ -14,6 +14,7 @@ main(void)
 
 	memset(&device, 0, sizeof(device));
 	device.vendor_id = 0x10ec;
+	device.class_code = 0x02;
 	device.device_id = 0xc821;
 	device.subsystem_vendor_id = 0x103c;
 	device.subsystem_id = 0x831a;
