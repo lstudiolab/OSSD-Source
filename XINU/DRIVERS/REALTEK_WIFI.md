@@ -45,10 +45,11 @@ must have its own match record and test status.
   hardware backend is implemented.
 - `ossd_realtek_wifi_firmware.c` validates firmware metadata, HTTPS provenance,
   filename safety, license/redistribution state, chipset family, transport,
-  exact chip name, silicon-revision range, byte length, and SHA-256 through a
-  platform-supplied cryptographic verifier. The lifecycle requires this
-  validation to pass before claiming hardware or loading firmware. No firmware
-  manifest or binary is currently approved for a Realtek chipset.
+  exact chip name, silicon-revision range, byte length, and SHA-256 through
+  an in-tree OSSD SHA-256 implementation. The digest comparison is constant
+  time. The lifecycle requires validation to pass before claiming hardware or
+  loading firmware. No firmware manifest or binary is currently approved for a
+  Realtek chipset.
 
 ## Existing XINU primitives and missing interfaces
 
@@ -82,8 +83,7 @@ Before a chipset backend can be considered functional, XINU must provide:
   platform-backed device-resource provider. The command-register helper exists,
   but no driver resource allocator currently owns or maps BARs.
 - USB and SDIO enumeration, host-controller transfers, resource assignment,
-  and driver binding.
-- Safe BAR/MMIO mapping and USB control/bulk/interrupt transfers.
+  and driver binding, including USB control/bulk/interrupt transfers.
 - DMA allocation, mapping, cache maintenance, and teardown.
 - MSI/MSI-X and legacy interrupt registration, synchronization, and teardown.
 - A firmware loader with bounded reads, integrity checks, and provenance.
@@ -93,9 +93,9 @@ Before a chipset backend can be considered functional, XINU must provide:
 - An 802.11 security/control plane covering WPA2/WPA3, key installation,
   roaming, regulatory domain, and user-space supplicant integration.
 
-The firmware validator is a completed safety boundary, but it does not fetch
-firmware, implement SHA-256 itself, or transfer firmware to hardware. The
-platform must supply a cryptographic verifier and a licensed firmware source.
+The firmware validator and in-tree SHA-256 verifier are implemented, but they
+ do not fetch firmware or transfer it to hardware. A trusted, licensed firmware
+source and a chipset-specific transfer implementation are still required.
 Do not write a chipset backend against guessed APIs; first implement and test
 the missing bus, resource, and network interfaces above.
 
