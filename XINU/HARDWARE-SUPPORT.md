@@ -84,9 +84,12 @@ collapsed into one assumed implementation.
 The initial read-only PCI enumeration layer is now present in the source tree.
 The generic scanner and x86-64 legacy configuration-space backend are wired
 into the x86-64 platform startup path, and discovered functions are logged.
-The generic scanner has a passing host-side regression test. This does not yet
-provide PCIe ECAM, arm64 PCI enumeration, resource allocation, DMA/interrupt
-setup, or functional device drivers. No Wi-Fi, audio, or laptop model is
+The generic scanner now supports caller-supplied ECAM mappings and nonzero PCI
+segments, and host-side regression tests cover both synthetic legacy-style
+configuration reads and a synthetic ECAM region. Real ACPI MCFG/Device Tree
+region discovery and physical ECAM mapping are not yet connected. Arm64 PCI
+enumeration, resource allocation, DMA/interrupt setup, and functional device
+drivers remain outstanding. No Wi-Fi, audio, or laptop model is
 currently certified as supported by this change.
 
 ## Driver architecture requirements
