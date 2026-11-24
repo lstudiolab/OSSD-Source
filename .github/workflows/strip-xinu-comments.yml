@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/strip-xinu-comments.yml"
       - ".github/scripts/strip_xinu_comments.py"
+      - ".github/scripts/add_xinu_modification_notices.py"
   workflow_dispatch:
 
 permissions:
@@ -21,6 +22,8 @@ jobs:
           fetch-depth: 0
       - name: Remove non-legal source comments
         run: python3 .github/scripts/strip_xinu_comments.py
+      - name: Add required OSSD modification notices
+        run: python3 .github/scripts/add_xinu_modification_notices.py
       - name: Commit cleaned source
         run: |
           if git diff --quiet -- XINU; then
