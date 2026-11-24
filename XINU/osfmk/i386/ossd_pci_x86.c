@@ -55,5 +55,5 @@ pci_x86_read(void *context __unused, uint8_t bus, uint8_t device,
 uint32_t
 ossd_pci_platform_enumerate(ossd_pci_device_fn found, void *found_context)
 {
-	return ossd_pci_scan(pci_x86_read, 0, found, found_context);
+	return ossd_pci_scan(pci_x86_read, 0, 0, 0, 255, found, found_context);
 }
