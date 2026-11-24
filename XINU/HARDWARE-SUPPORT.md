@@ -79,6 +79,16 @@ microphone input, speaker/headphone routing, jack detection, and power-state
 transitions. Intel SST and HDA are distinct controller paths and must not be
 collapsed into one assumed implementation.
 
+## Current implementation snapshot
+
+The initial read-only PCI enumeration layer is now present in the source tree.
+The generic scanner and x86-64 legacy configuration-space backend are wired
+into the x86-64 platform startup path, and discovered functions are logged.
+The generic scanner has a passing host-side regression test. This does not yet
+provide PCIe ECAM, arm64 PCI enumeration, resource allocation, DMA/interrupt
+setup, or functional device drivers. No Wi-Fi, audio, or laptop model is
+currently certified as supported by this change.
+
 ## Driver architecture requirements
 
 - Keep bus enumeration and device matching separate from function drivers.
