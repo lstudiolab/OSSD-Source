@@ -3,8 +3,6 @@ name: Import XINU source
 on:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/import-xinu.yml"
 
 permissions:
   contents: write
