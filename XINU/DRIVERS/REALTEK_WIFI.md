@@ -68,10 +68,20 @@ bits, writing zero to the write-one-to-clear status half. Callers must
 serialize the complete read/modify/write sequence and must not enable bus
 mastering until DMA mappings are ready.
 
-The registry is a binding contract only: it does not map BARs, assign bus
-resources, enable bus mastering, allocate DMA, configure MSI/MSI-X, or provide
-a platform resource provider. Registry mutation and device lifecycle calls
-must currently be externally serialized.
+The PCI resource layer now includes an explicit BAR sizing operation and
+firmware-assigned MMIO mapping contract. BAR sizing temporarily disables I/O
+and memory decoding, reads 32-bit or 64-bit size masks, restores BAR registers,
+and restores the PCI command register. It does not assign addresses. BAR
+mapping accepts memory BARs only and delegates mapping attributes to a
+platform callback; the callback must map the range as device memory, not
+cacheable RAM. Bounded 8/16/32-bit MMIO accessors validate alignment and range
+and issue sequentially consistent fences. The caller must serialize BAR sizing
+against all other config-space access.
+
+The registry remains a binding contract: it does not assign BAR addresses,
+allocate DMA, configure MSI/MSI-X, or provide a concrete platform resource
+provider. Registry mutation and device lifecycle calls must currently be
+externally serialized.
 
 The repository inventory does not currently contain a USB host-controller
 stack, an SDIO host-controller stack, an IOKit PCI device provider/resource
@@ -81,9 +91,10 @@ association, key management, or radio control.
 
 Before a chipset backend can be considered functional, XINU must provide:
 
-- PCI BAR sizing/assignment, safe MMIO mapping, resource ownership, and a
-  platform-backed device-resource provider. The command-register helper exists,
-  but no driver resource allocator currently owns or maps BARs.
+- PCI BAR assignment/resource-window management and a platform-backed device
+  resource provider. BAR sizing and callback-backed MMIO mapping now exist,
+  but platform-specific mapping, ownership arbitration, and cleanup integration
+  still need implementation.
 - USB and SDIO enumeration, host-controller transfers, resource assignment,
   and driver binding, including USB control/bulk/interrupt transfers.
 - DMA allocation, mapping, cache maintenance, and teardown.
