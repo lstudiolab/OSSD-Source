@@ -30,7 +30,7 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 	    device->state != OSSD_RTW_STATE_FAILED) return -2;
 	ops = device->ops;
 	if (ops->claim == 0 || ops->reset == 0 ||
-	    ops->verify_firmware == 0 || ops->load_firmware == 0 ||
+	    ops->load_firmware == 0 ||
 	    ops->initialize == 0 || ops->start == 0 || ops->release == 0 ||
 	    ops->stop == 0 || device->firmware == 0 ||
 	    device->firmware_bytes == 0) return -3;
@@ -38,8 +38,7 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 	/* Reject unknown, mismatched, unlicensed, or corrupt blobs before I/O. */
 	error = ossd_rtw_firmware_validate(device->firmware, device->match,
 	    device->silicon_revision, device->firmware_bytes,
-	    device->firmware_length, ops->verify_firmware,
-	    device->backend_context);
+	    device->firmware_length);
 	if (error != 0) {
 		device->state = OSSD_RTW_STATE_FAILED;
 		device->last_error = error;
