@@ -45,6 +45,28 @@ mock_read(void *context, uint8_t bus, uint8_t device, uint8_t function,
 	return 0xffffffffU;
 }
 
+
+static uint32_t command_register;
+static uint32_t command_write_value;
+static uint32_t
+command_read(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	assert(offset == 0x04);
+	return command_register;
+}
+
+static void
+command_write(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset, uint32_t value)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	assert(offset == 0x04);
+	command_write_value = value;
+	command_register = value;
+}
+
 struct test_state {
 	uint32_t count;
 	int found_network;
@@ -114,6 +136,20 @@ main(void)
 		    record_device, &state) == 1);
 		assert(state.count == 1 && state.found_ecam);
 	}
+	/* Command writes preserve low bits and never echo W1C status bits. */
+	command_register = 0xa5a50040U;
+	command_write_value = 0xffffffffU;
+	assert(ossd_pci_update_command(command_read, command_write, 0, 0, 1, 0,
+	    OSSD_PCI_COMMAND_MEMORY_SPACE, 0) == 0);
+	assert(command_write_value == 0x0042U);
+	assert(ossd_pci_update_command(command_read, command_write, 0, 0, 1, 0,
+	    OSSD_PCI_COMMAND_BUS_MASTER, OSSD_PCI_COMMAND_MEMORY_SPACE) == 0);
+	assert(command_write_value == 0x0044U);
+	assert(ossd_pci_update_command(command_read, command_write, 0, 0, 1, 0,
+	    0x8000U, 0) == -1);
+	assert(ossd_pci_update_command(command_read, command_write, 0, 0, 1, 0,
+	    OSSD_PCI_COMMAND_IO_SPACE, OSSD_PCI_COMMAND_IO_SPACE) == -1);
+	assert(ossd_pci_update_command(command_read, 0, 0, 0, 1, 0, 0, 0) == -1);
 	puts("XINU PCI and ECAM enumeration tests passed");
 	return 0;
 }
