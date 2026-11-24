@@ -229,9 +229,6 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 	    (control & PCI_MSI_PER_VECTOR_MASK) != 0;
 	state->mask_register_offset = (uint16_t)(capability +
 	    ((control & PCI_MSI_64BIT) != 0 ? 16U : 12U));
-	state->original_mask = state->has_per_vector_mask ?
-	    read_config(config_context, device->bus, device->device,
-	    device->function, state->mask_register_offset) : 0;
 	address_high_offset = (uint16_t)(capability + 8U);
 	data_offset = (uint16_t)(capability +
 	    ((control & PCI_MSI_64BIT) != 0 ? 12U : 8U));
@@ -245,6 +242,9 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 		state->message.provider_cookie = 0;
 		return -7;
 	}
+	state->original_mask = state->has_per_vector_mask ?
+	    read_config(config_context, device->bus, device->device,
+	    device->function, state->mask_register_offset) : 0;
 	state->original_address_low = read_config(config_context, device->bus,
 	    device->device, device->function, (uint16_t)(capability + 4U));
 	state->original_address_high = (control & PCI_MSI_64BIT) != 0 ?
@@ -256,6 +256,9 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 	    device->function, 0x04);
 	if (command_status == PCI_ABSENT) {
 		provider->release(provider_context, &state->message);
+		state->message.address = 0;
+		state->message.data = 0;
+		state->message.provider_cookie = 0;
 		state->active = 0;
 		return -2;
 	}
