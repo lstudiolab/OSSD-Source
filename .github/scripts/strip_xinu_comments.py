@@ -42,13 +42,6 @@ def c_strip(src, asm=False):
             elif c == quote:
                 quote = None
             continue
-        if src.startswith('R"', i):
-            m = re.match(r'R"([^ ()\\\\\t\r\n]{0,16})\\(', src[i:])
-            if m:
-                delim = m.group(1)
-                token = m.group(0)
-                raw_end = ")" + delim + '"'
-                out.append(token); i += len(token); continue
         if src[i] in ('"', "'"):
             quote = src[i]; out.append(src[i]); i += 1; continue
         if src.startswith("//", i):
