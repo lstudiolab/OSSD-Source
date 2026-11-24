@@ -7,8 +7,10 @@ on:
       - "XINU/tests/ossd_pci_scan_test.c"
       - "XINU/osfmk/device/ossd_realtek_wifi.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_core.*"
+      - "XINU/osfmk/device/ossd_realtek_wifi_firmware.*"
       - "XINU/tests/ossd_realtek_wifi_match_test.c"
       - "XINU/tests/ossd_realtek_wifi_core_test.c"
+      - "XINU/tests/ossd_realtek_wifi_firmware_test.c"
       - ".github/workflows/xinu-pci-tests.yml"
   pull_request:
     paths:
@@ -62,6 +64,17 @@ jobs:
             -I XINU/osfmk/device \
             XINU/osfmk/device/ossd_realtek_wifi.c \
             XINU/osfmk/device/ossd_realtek_wifi_core.c \
+            XINU/osfmk/device/ossd_realtek_wifi_firmware.c \
             XINU/tests/ossd_realtek_wifi_core_test.c \
             -o /tmp/ossd-realtek-core-test
           /tmp/ossd-realtek-core-test
+
+      - name: Compile and run Realtek firmware manifest tests
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror \\
+            -I XINU/osfmk \\
+            -I XINU/osfmk/device \\
+            XINU/osfmk/device/ossd_realtek_wifi_firmware.c \\
+            XINU/tests/ossd_realtek_wifi_firmware_test.c \\
+            -o /tmp/ossd-realtek-firmware-test
+          /tmp/ossd-realtek-firmware-test
