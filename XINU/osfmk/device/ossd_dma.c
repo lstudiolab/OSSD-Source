@@ -50,6 +50,7 @@ ossd_dma_allocate(const struct ossd_dma_provider_ops *ops, void *context,
 	mapping->length = 0;
 	mapping->provider_cookie = 0;
 	mapping->active = 0;
+	mapping->direction = 0;
 	max_address = address_bits == 64 ? UINT64_MAX :
 	    ((1ULL << address_bits) - 1ULL);
 
@@ -67,6 +68,7 @@ ossd_dma_allocate(const struct ossd_dma_provider_ops *ops, void *context,
 		mapping->length = 0;
 		mapping->provider_cookie = 0;
 		mapping->active = 0;
+		mapping->direction = 0;
 		return -2;
 	}
 	last_address = mapping->device_address + length - 1ULL;
@@ -79,9 +81,11 @@ ossd_dma_allocate(const struct ossd_dma_provider_ops *ops, void *context,
 		mapping->length = 0;
 		mapping->provider_cookie = 0;
 		mapping->active = 0;
+		mapping->direction = 0;
 		return -3;
 	}
 	mapping->length = length;
+	mapping->direction = (uint8_t)direction;
 	mapping->active = 1;
 	return 0;
 }
@@ -98,6 +102,7 @@ ossd_dma_release(const struct ossd_dma_provider_ops *ops, void *context,
 	mapping->length = 0;
 	mapping->provider_cookie = 0;
 	mapping->active = 0;
+	mapping->direction = 0;
 }
 
 int
@@ -108,7 +113,9 @@ ossd_dma_sync_for_device(const struct ossd_dma_provider_ops *ops,
 	int error;
 	if (ops == 0 || ops->sync_for_device == 0 ||
 	    !dma_range_valid(mapping, offset, length) ||
-	    !dma_valid_direction(direction)) return -1;
+	    !dma_valid_direction(direction) ||
+	    (mapping->direction != OSSD_DMA_BIDIRECTIONAL &&
+	    mapping->direction != (uint8_t)direction)) return -1;
 	__atomic_thread_fence(__ATOMIC_SEQ_CST);
 	error = ops->sync_for_device(context, mapping, offset, length, direction);
 	__atomic_thread_fence(__ATOMIC_SEQ_CST);
