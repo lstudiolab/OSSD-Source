@@ -7,7 +7,6 @@ on:
       - "XINU/tests/ossd_dma_test.c"
       - "XINU/osfmk/device/ossd_pci.*"
       - "XINU/osfmk/conf/files"
-      - "XINU/osfmk/conf/files"
       - "XINU/osfmk/device/ossd_pci_driver.*"
       - "XINU/tests/ossd_pci_driver_test.c"
       - "XINU/tests/ossd_pci_scan_test.c"
@@ -26,6 +25,7 @@ on:
       - ".github/workflows/xinu-pci-tests.yml"
   pull_request:
     paths:
+      - "XINU/osfmk/conf/files"
       - "XINU/osfmk/device/ossd_pci_driver.*"
       - "XINU/tests/ossd_pci_driver_test.c"
       - "XINU/osfmk/device/ossd_dma.*"
@@ -63,6 +63,11 @@ jobs:
             XINU/tests/ossd_dma_test.c \
             -o /tmp/ossd-dma-test
           /tmp/ossd-dma-test
+      - name: Verify OSSD device sources are in the kernel manifest
+        run: |
+          grep -Fq 'osfmk/device/ossd_dma.c' XINU/osfmk/conf/files
+          grep -Fq 'osfmk/device/ossd_pci.c' XINU/osfmk/conf/files
+          grep -Fq 'osfmk/device/ossd_realtek_wifi_core.c' XINU/osfmk/conf/files
       - name: Compile PCI scanner with warnings as errors
         run: |
           cc -std=c11 -Wall -Wextra -Werror \
