@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <device/ossd_realtek_wifi.h>
+#include <device/ossd_realtek_wifi_firmware.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,13 +28,16 @@ enum ossd_rtw_state {
 /*
  * Bus/chipset-specific implementations supply these operations. All methods
  * return 0 on success and a negative errno-style value on failure. Firmware
- * loading must verify the selected blob's integrity and provenance before
- * exposing it to hardware. Callbacks must enforce bounded hardware timeouts.
+ * bytes are authenticated by the verifier before claim/reset/load; the loader
+ * must still enforce the chipset's bounded transfer protocol and timeouts.
  */
 struct ossd_rtw_backend_ops {
 	int (*claim)(void *context);
 	int (*reset)(void *context);
-	int (*load_firmware)(void *context, const char *firmware_name);
+	ossd_rtw_sha256_verify_fn verify_firmware;
+	int (*load_firmware)(void *context,
+	    const struct ossd_rtw_firmware_manifest *manifest,
+	    const void *bytes, size_t length);
 	int (*initialize)(void *context, const struct ossd_rtw_match *match);
 	int (*start)(void *context);
 	void (*stop)(void *context);
@@ -44,6 +48,10 @@ struct ossd_rtw_backend_ops {
 
 struct ossd_rtw_device {
 	const struct ossd_rtw_match *match;
+	const struct ossd_rtw_firmware_manifest *firmware;
+	const void *firmware_bytes;
+	size_t firmware_length;
+	uint16_t silicon_revision;
 	const struct ossd_rtw_backend_ops *ops;
 	void *backend_context;
 	enum ossd_rtw_state state;
