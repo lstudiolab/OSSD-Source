@@ -94,7 +94,7 @@ Before a chipset backend can be considered functional, XINU must provide:
   roaming, regulatory domain, and user-space supplicant integration.
 
 The firmware validator and in-tree SHA-256 verifier are implemented, but they
- do not fetch firmware or transfer it to hardware. A trusted, licensed firmware
+do not fetch firmware or transfer it to hardware. A trusted, licensed firmware
 source and a chipset-specific transfer implementation are still required.
 Do not write a chipset backend against guessed APIs; first implement and test
 the missing bus, resource, and network interfaces above.
