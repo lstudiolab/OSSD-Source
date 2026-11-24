@@ -5,6 +5,8 @@ on:
     paths:
       - "XINU/osfmk/device/ossd_pci.*"
       - "XINU/tests/ossd_pci_scan_test.c"
+      - "XINU/osfmk/device/ossd_realtek_wifi.*"
+      - "XINU/tests/ossd_realtek_wifi_match_test.c"
       - ".github/workflows/xinu-pci-tests.yml"
   pull_request:
     paths:
@@ -38,3 +40,12 @@ jobs:
             -o /tmp/ossd-pci-x86.o
       - name: Run PCI scanner tests
         run: /tmp/ossd-pci-test
+      - name: Compile and run Realtek PCI match tests
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror \\
+            -I XINU/osfmk \\
+            -I XINU/osfmk/device \\
+            XINU/osfmk/device/ossd_realtek_wifi.c \\
+            XINU/tests/ossd_realtek_wifi_match_test.c \\
+            -o /tmp/ossd-realtek-match-test
+          /tmp/ossd-realtek-match-test
