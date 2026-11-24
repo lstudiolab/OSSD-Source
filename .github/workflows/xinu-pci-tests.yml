@@ -10,6 +10,7 @@ on:
       - "XINU/osfmk/device/ossd_realtek_wifi.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_core.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_firmware.*"
+      - "XINU/osfmk/device/ossd_realtek_wifi_sha256.*"
       - "XINU/tests/ossd_realtek_wifi_match_test.c"
       - "XINU/tests/ossd_realtek_wifi_core_test.c"
       - "XINU/tests/ossd_realtek_wifi_firmware_test.c"
