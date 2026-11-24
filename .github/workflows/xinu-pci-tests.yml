@@ -26,6 +26,8 @@ on:
     paths:
       - "XINU/osfmk/device/ossd_pci_driver.*"
       - "XINU/tests/ossd_pci_driver_test.c"
+      - "XINU/osfmk/device/ossd_dma.*"
+      - "XINU/tests/ossd_dma_test.c"
       - "XINU/osfmk/device/ossd_pci.*"
       - "XINU/tests/ossd_pci_scan_test.c"
       - "XINU/osfmk/device/ossd_realtek_wifi.*"
