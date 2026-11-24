@@ -94,13 +94,14 @@ yet enable Realtek DMA rings or bus mastering.
 
 The PCI layer now also discovers the conventional MSI capability and can
 configure or tear down one MSI vector through a platform-supplied vector
-provider. It handles 32-bit and 64-bit MSI messages, optional per-vector
-masking, disables legacy INTx while MSI is active, and restores the original
-INTx-disable and mask state on teardown. The provider must install the
-architecture interrupt route before returning the MSI address/data. MSI-X is
-not implemented. No x86-64 APIC or arm64 GIC vector provider is wired into XCU,
-so this remains a tested configuration contract rather than usable hardware
-interrupt delivery. Registry mutation and device lifecycle calls must
+provider. It handles 32-bit and 64-bit MSI messages, validates capability
+bounds and 32-bit address limits, optionally masks the vector during setup,
+disables legacy INTx while MSI is active, and restores the original message
+address/data, mask, control flags, and INTx-disable state on teardown. The
+provider must install the architecture interrupt route before returning the
+MSI address/data. MSI-X is not implemented. No x86-64 APIC or arm64 GIC vector
+provider is wired into XCU, so this remains a tested configuration contract
+rather than usable hardware interrupt delivery. Registry mutation and device lifecycle calls must
 currently be externally serialized.
 
 The repository inventory does not currently contain a USB host-controller
