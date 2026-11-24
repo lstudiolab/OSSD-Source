@@ -28,6 +28,7 @@
  */
 
 #include <IOKit/IOCPU.h>
+#include <device/ossd_pci.h>
 #include <IOKit/IOPlatformActions.h>
 #include <IOKit/IODeviceTreeSupport.h>
 #include <IOKit/IOKitDebug.h>
@@ -114,6 +115,19 @@ static IODTNVRAM *gIOOptionsEntry;
 
 OSSymbol * gPlatformInterruptControllerName;
 
+#if defined(__x86_64__)
+static void
+ossd_pci_log_device(void *context __unused,
+    const struct ossd_pci_device *device)
+{
+	IOLog("XINU: PCI %02x:%02x.%u %04x:%04x class %02x:%02x\n",
+	    device->bus, device->device, device->function,
+	    device->vendor_id, device->device_id,
+	    device->class_code, device->subclass);
+}
+#endif
+
+
                                                                            
 
 bool
@@ -174,6 +188,11 @@ IOPlatformExpert::start( IOService * provider )
 
 	setPlatform( this );
 	gIOPlatform = this;
+
+#if defined(__x86_64__)
+	/* Read-only inventory pass; no device is enabled or reconfigured. */
+	(void)ossd_pci_platform_enumerate(ossd_pci_log_device, NULL);
+#endif
 
 	PMInstantiatePowerDomains();
 
