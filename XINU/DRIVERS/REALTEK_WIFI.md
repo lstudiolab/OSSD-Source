@@ -53,10 +53,17 @@ must have its own match record and test status.
 ## Existing XINU primitives and missing interfaces
 
 The source tree contains reusable BSD `ifnet` networking interfaces,
-`IODMACommand` DMA abstractions, and IOKit interrupt event-source APIs. The
-PCI configuration scanner and x86-64 configuration-mechanism backend are also
-present. These are building blocks, not proof that a wireless driver can bind
-or run.
+`IODMACommand` DMA abstractions, and IOKit interrupt event-source APIs. PCI
+configuration scanning is available through the x86-64 mechanism #1 backend
+or a caller-mapped ECAM window. A bounded PCI driver registry now provides
+vendor/device/subsystem/class matching, ordered probe attempts, duplicate
+function rejection, and deterministic remove callbacks. Its tests cover
+matching, failed probes, duplicate attachment, and detach cleanup.
+
+The registry is a binding contract only: it does not map BARs, assign bus
+resources, enable bus mastering, allocate DMA, configure MSI/MSI-X, or provide
+a platform resource provider. Registry mutation and device lifecycle calls
+must currently be externally serialized.
 
 The repository inventory does not currently contain a USB host-controller
 stack, an SDIO host-controller stack, an IOKit PCI device provider/resource
@@ -66,7 +73,10 @@ association, key management, or radio control.
 
 Before a chipset backend can be considered functional, XINU must provide:
 
-- PCI/PCIe and USB enumeration, resource assignment, and driver binding.
+- PCI BAR sizing/assignment, safe MMIO mapping, resource ownership, bus-master
+  control, and a platform-backed device-resource provider.
+- USB and SDIO enumeration, host-controller transfers, resource assignment,
+  and driver binding.
 - Safe BAR/MMIO mapping and USB control/bulk/interrupt transfers.
 - DMA allocation, mapping, cache maintenance, and teardown.
 - MSI/MSI-X and legacy interrupt registration, synchronization, and teardown.
@@ -85,8 +95,9 @@ the missing bus, resource, and network interfaces above.
 
 ## Bring-up sequence
 
-1. Enumerate the device and validate vendor/device/subsystem/revision IDs.
-2. Validate BARs or USB interface endpoints and required DMA capabilities.
+1. Enumerate the device and bind a candidate driver through the PCI registry.
+2. Validate vendor/device/subsystem/revision IDs, BAR type/size/address,
+   interrupt capabilities, and DMA constraints before acquiring resources.
 3. Quiesce/reset the device with bounded timeouts.
 4. Load the exact firmware required by that chipset revision.
 5. Initialize power, clocks, efuse/EEPROM calibration, RF, MAC, and PHY.
