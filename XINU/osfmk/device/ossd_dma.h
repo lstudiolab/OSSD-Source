@@ -29,6 +29,7 @@ struct ossd_dma_mapping {
 	uint64_t length;
 	void *provider_cookie;
 	uint8_t active;
+	uint8_t direction;
 };
 
 struct ossd_dma_provider_ops {
