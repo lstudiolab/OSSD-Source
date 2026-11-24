@@ -57,11 +57,11 @@ jobs:
           /tmp/ossd-realtek-match-test
       - name: Compile and run Realtek lifecycle tests
         run: |
-          cc -std=c11 -Wall -Wextra -Werror \\
-            -I XINU/osfmk \\
-            -I XINU/osfmk/device \\
-            XINU/osfmk/device/ossd_realtek_wifi.c \\
-            XINU/osfmk/device/ossd_realtek_wifi_core.c \\
-            XINU/tests/ossd_realtek_wifi_core_test.c \\
+          cc -std=c11 -Wall -Wextra -Werror \
+            -I XINU/osfmk \
+            -I XINU/osfmk/device \
+            XINU/osfmk/device/ossd_realtek_wifi.c \
+            XINU/osfmk/device/ossd_realtek_wifi_core.c \
+            XINU/tests/ossd_realtek_wifi_core_test.c \
             -o /tmp/ossd-realtek-core-test
           /tmp/ossd-realtek-core-test
