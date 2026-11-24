@@ -82,6 +82,41 @@ int ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
     const struct ossd_pci_device *device, uint8_t bar_index,
     struct ossd_pci_bar_info *result);
 
+struct ossd_pci_mmio_ops {
+	/* Map with device-memory attributes; never cache PCI register windows. */
+	int (*map)(void *context, uint64_t physical_address, uint64_t length,
+	    volatile void **virtual_address);
+	void (*unmap)(void *context, volatile void *virtual_address,
+	    uint64_t length);
+};
+
+struct ossd_pci_mmio_region {
+	volatile uint8_t *base;
+	uint64_t physical_address;
+	uint64_t length;
+	uint8_t bar_index;
+};
+
+int ossd_pci_map_bar(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device, uint8_t bar_index,
+    uint64_t minimum_length, const struct ossd_pci_mmio_ops *ops,
+    void *map_context, struct ossd_pci_mmio_region *region);
+void ossd_pci_unmap_bar(const struct ossd_pci_mmio_ops *ops,
+    void *map_context, struct ossd_pci_mmio_region *region);
+int ossd_pci_mmio_read8(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint8_t *value);
+int ossd_pci_mmio_read16(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint16_t *value);
+int ossd_pci_mmio_read32(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint32_t *value);
+int ossd_pci_mmio_write8(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint8_t value);
+int ossd_pci_mmio_write16(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint16_t value);
+int ossd_pci_mmio_write32(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint32_t value);
+
 struct ossd_pci_ecam_region {
 	uint64_t base_address;
 	uint16_t segment;
