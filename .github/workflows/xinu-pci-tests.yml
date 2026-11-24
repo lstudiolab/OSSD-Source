@@ -30,7 +30,9 @@ jobs:
         run: |
           cc -std=c11 -Wall -Wextra -Werror \
             -D__unused='__attribute__((unused))' \
+            -I XINU/tests/include \
             -I XINU/osfmk \
+            -I XINU/EXTERNAL_HEADERS \
             -I XINU/EXTERNAL_HEADERS/architecture \
             -c XINU/osfmk/i386/ossd_pci_x86.c \
             -o /tmp/ossd-pci-x86.o
