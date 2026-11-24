@@ -35,10 +35,16 @@ must have its own match record and test status.
   rejects non-network PCI class devices. Subsystem wildcard support is present.
 - The module is included in the Mach source manifest and exported device
   headers. A host regression test checks positive and negative matches.
-- The PCI ID table is a candidate inventory based on public hardware ID
-  references; it is not an initialized device driver. USB and SDIO matching,
-  firmware, register operations, DMA, interrupts, and network attachment remain
-  unimplemented.
+- PCIe, USB, and SDIO candidate-identification APIs and match tables are present.
+  USB matching checks the vendor-specific interface tuple; SDIO matching checks
+  the Realtek SDIO vendor/device pair. IDs identify candidates only.
+- `ossd_realtek_wifi_core.c` provides a transactional lifecycle contract
+  (claim, reset, firmware handoff, initialize, start, stop, transmit, scan)
+  with failure unwind. It requires a transport/chipset backend to provide every
+  hardware operation. No Realtek hardware backend is implemented.
+- Firmware names remain unset until exact chip/revision firmware provenance,
+  checksums, and redistribution terms are verified. The lifecycle refuses to
+  start without a verified firmware identifier.
 
 ## Required XINU interfaces
 
@@ -109,6 +115,8 @@ Never promote an entire family to supported based on one device.
 | Family / variant | Bus | Status | Evidence |
 |---|---|---|---|
 | RTL8188 / RTL8192 PCIe IDs listed in source | PCIe | experimental matching only | Match regression test; no hardware initialization |
+| RTL8xxx USB candidate IDs | USB | experimental matching only | Interface and product-ID tests; no USB host binding |
+| RTL8723/8821/8822 SDIO candidate IDs | SDIO | experimental matching only | Vendor/device-ID tests; no SDIO host binding |
 | RTL8723 PCIe IDs listed in source | PCIe | experimental matching only | Match regression test; no hardware initialization |
 | RTL8812 / RTL8814 PCIe variants | PCIe | planned | Not all PCI IDs mapped; no hardware test |
 | RTL8821 / RTL8822 PCIe variants | PCIe | experimental matching only | Match regression test; no hardware initialization |
