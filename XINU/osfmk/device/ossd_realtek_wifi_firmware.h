@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <device/ossd_realtek_wifi.h>
+#include <device/ossd_realtek_wifi_sha256.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,14 +46,6 @@ struct ossd_rtw_firmware_manifest {
 };
 
 /*
- * A platform crypto implementation supplies SHA-256 verification. Return
- * zero only when the bytes hash to expected_sha256_hex. The verifier must
- * compare all 32 digest bytes in constant time.
- */
-typedef int (*ossd_rtw_sha256_verify_fn)(void *context,
-    const void *bytes, size_t length, const char *expected_sha256_hex);
-
-/*
  * Validates metadata, exact chipset/transport/revision binding, byte length,
  * redistribution policy, and the blob digest. No firmware is loaded here.
  * Returns 0 on success; negative errno-style values on rejection.
@@ -62,9 +55,7 @@ int ossd_rtw_firmware_validate(
     const struct ossd_rtw_match *match,
     uint16_t silicon_revision,
     const void *bytes,
-    size_t length,
-    ossd_rtw_sha256_verify_fn verify_sha256,
-    void *verify_context);
+    size_t length);
 
 #ifdef __cplusplus
 }
