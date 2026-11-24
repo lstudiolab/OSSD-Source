@@ -1,0 +1,124 @@
+# Realtek Wi-Fi support in XINU
+
+## Status
+
+**Planned; no Realtek Wi-Fi chipset is currently verified as supported by XINU.**
+This document is the implementation contract and coverage inventory. A PCI/USB
+ID match, firmware file being present, or a successful compile is not evidence
+of working Wi-Fi.
+
+XINU is intended to support x86-64 and arm64 PCs and laptops. Realtek support
+must be implemented against XINU's own bus, DMA, interrupt, firmware, network,
+and power-management interfaces. Do not load Linux kernel modules or assume
+Linux mac80211/cfg80211 APIs exist in XNU's I/O Kit.
+
+## Driver families
+
+Keep separate family backends. The silicon generations do not share one
+universal register protocol.
+
+| Family | Transport | Representative chipsets | Target driver |
+|---|---|---|---|
+| RTL8xxx legacy | PCIe / USB / SDIO | RTL8188, RTL8192, RTL8723, RTL8812, RTL8814 | `rtl8xxx` |
+| RTW88 (802.11ac) | PCIe / USB / SDIO | RTL8723D, RTL8821C, RTL8822B, RTL8822C, RTL8812A, RTL8814A | `rtw88` |
+| RTW89 (802.11ax/be) | PCIe / USB | RTL8851B, RTL8852A/B/C, RTL8922A | `rtw89` |
+
+This is a family-level target list, not a claim that every transport or
+subsystem variant is supported. Each exact chip/transport/revision combination
+must have its own match record and test status.
+
+## Required XINU interfaces
+
+Before a chipset backend can be considered functional, XINU must provide:
+
+- PCI/PCIe and USB enumeration, resource assignment, and driver binding.
+- Safe BAR/MMIO mapping and USB control/bulk/interrupt transfers.
+- DMA allocation, mapping, cache maintenance, and teardown.
+- MSI/MSI-X and legacy interrupt registration, synchronization, and teardown.
+- A firmware loader with bounded reads, integrity checks, and provenance.
+- Work queues, timers, locks, reset/recovery, and power-state transitions.
+- A network-device contract for scan results, authentication/association,
+  transmit/receive queues, link state, and packet ownership.
+- An 802.11 security/control plane covering WPA2/WPA3, key installation,
+  roaming, regulatory domain, and user-space supplicant integration.
+
+The current driver roadmap does not establish that these prerequisites exist.
+Do not write a chipset backend against guessed APIs; first define and test the
+interfaces above.
+
+## Bring-up sequence
+
+1. Enumerate the device and validate vendor/device/subsystem/revision IDs.
+2. Validate BARs or USB interface endpoints and required DMA capabilities.
+3. Quiesce/reset the device with bounded timeouts.
+4. Load the exact firmware required by that chipset revision.
+5. Initialize power, clocks, efuse/EEPROM calibration, RF, MAC, and PHY.
+6. Configure channels, regulatory constraints, antenna paths, and rate control.
+7. Register a network interface only after initialization fully succeeds.
+8. Implement scan, authentication, association, key setup, TX/RX, disconnect,
+   reset, suspend/resume, and hot-unplug handling.
+9. Test sustained bidirectional traffic, packet loss, reconnect, suspend/resume,
+   and recovery from firmware/transport errors on physical hardware.
+
+A failed probe must unwind DMA, interrupts, mappings, work items, and firmware
+state. Optional Wi-Fi failure must never prevent the machine from booting.
+
+## Firmware and licensing
+
+Firmware is separate from driver source. For every firmware blob, record its
+filename, chipset/revision, upstream source, checksum, license, redistribution
+permission, and required path. Only redistribute blobs whose license permits
+it. If redistribution is not permitted, document a user-supplied firmware
+installation path and fail clearly when the blob is missing.
+
+Do not copy GPL-licensed Linux driver code into the XNU-derived source tree
+without a deliberate licensing review. Prefer a clean-room XINU-native
+implementation based on public hardware documentation and legally usable
+firmware. If a separately licensed driver component is ever used, keep its
+license and boundary explicit.
+
+## Support-state rules
+
+- **planned** — family is in scope; no implementation claim.
+- **experimental** — code exists and compiles, but physical functional tests
+  are incomplete.
+- **partial** — a specific chip/transport/revision passed some, but not all,
+  required tests; list the missing tests.
+- **supported** — exact device variants passed initialization, scan,
+  association, WPA2/WPA3 as applicable, sustained TX/RX, reconnect, and
+  suspend/resume tests on physical hardware.
+- **unsupported** — no usable implementation or required firmware.
+
+Never promote an entire family to supported based on one device.
+
+## Initial compatibility matrix
+
+| Family / variant | Bus | Status | Evidence |
+|---|---|---|---|
+| RTL8188 / RTL8192 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
+| RTL8723 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
+| RTL8812 / RTL8814 variants | PCIe / USB | planned | No XINU driver or hardware test |
+| RTL8821 / RTL8822 variants | PCIe / USB / SDIO | planned | No XINU driver or hardware test |
+| RTL8851B / RTL8852 variants | PCIe / USB | planned | No XINU driver or hardware test |
+| RTL8922 variants | PCIe / USB | planned | No XINU driver or hardware test |
+
+## Laptop validation
+
+The HP ProBook 450 G-series name alone does not identify its Wi-Fi module:
+configurations vary by generation and regional SKU. Keep the machine in the
+physical test matrix, but identify its installed wireless controller from
+PCI/USB enumeration before claiming a match. This does not limit general
+development: all supported Realtek IDs should be covered by the compatibility
+database, not only one laptop.
+
+## Upstream technical references
+
+- Linux RTW89 chipset/transport configuration:
+  https://github.com/torvalds/linux/blob/master/drivers/net/wireless/realtek/rtw89/Kconfig
+- RTW88 family and transport coverage reference:
+  https://github.com/lwfinger/rtw88
+- Firmware provenance and redistribution metadata:
+  https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/WHENCE
+
+These are research references only. Their code and APIs are not XINU driver
+implementations, and their licensing must be reviewed independently.
