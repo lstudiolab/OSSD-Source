@@ -223,6 +223,11 @@ else # CURRENT_BUILD_CONFIG
 include $(MakeInc_cmd)
 include $(MakeInc_def)
 
+# Reject legacy 32-bit kernel configurations even when invoked directly.
+ifneq ($(filter ARM arm I386 i386 X86 x86,$(CURRENT_ARCH_CONFIG)),)
+$(error OSSD XCU supports 64-bit kernel targets only: x86_64 and arm64)
+endif
+
 ALL_SUBDIRS = \
 	security \
 	bsd  \
