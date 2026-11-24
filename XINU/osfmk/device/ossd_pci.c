@@ -27,6 +27,7 @@ pci_read(ossd_pci_config_read_fn read_config, void *context,
 
 uint32_t
 ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
+    uint16_t segment, uint8_t first_bus, uint8_t last_bus,
     ossd_pci_device_fn found, void *found_context)
 {
 	uint32_t count = 0;
@@ -37,7 +38,7 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 	}
 
 	/*
-	 * Scan the complete 8-bit bus-number space. This also discovers buses
+	 * Scan the caller-provided bus-number range. This also discovers buses
 	 * behind bridges without assuming firmware assigned contiguous numbers.
 	 * Reads are side-effect-free; this routine deliberately does not size
 	 * BARs, enable bus mastering, or alter bridge windows.
