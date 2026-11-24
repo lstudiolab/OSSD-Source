@@ -16,6 +16,8 @@ on:
       - ".github/workflows/xinu-pci-tests.yml"
   pull_request:
     paths:
+      - "XINU/osfmk/device/ossd_pci_driver.*"
+      - "XINU/tests/ossd_pci_driver_test.c"
       - "XINU/osfmk/device/ossd_pci.*"
       - "XINU/tests/ossd_pci_scan_test.c"
       - "XINU/osfmk/device/ossd_realtek_wifi.*"
@@ -42,11 +44,11 @@ jobs:
             -o /tmp/ossd-pci-test
       - name: Compile and run PCI driver registry tests
         run: |
-          cc -std=c11 -Wall -Wextra -Werror \\
-            -I XINU/osfmk \\
-            -I XINU/osfmk/device \\
-            XINU/osfmk/device/ossd_pci_driver.c \\
-            XINU/tests/ossd_pci_driver_test.c \\
+          cc -std=c11 -Wall -Wextra -Werror \
+            -I XINU/osfmk \
+            -I XINU/osfmk/device \
+            XINU/osfmk/device/ossd_pci_driver.c \
+            XINU/tests/ossd_pci_driver_test.c \
             -o /tmp/ossd-pci-driver-test
           /tmp/ossd-pci-driver-test
       - name: Compile x86-64 PCI port-I/O backend
