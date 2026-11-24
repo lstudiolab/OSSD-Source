@@ -118,6 +118,8 @@ def main():
             new = c_strip(text)
         elif ext in ASM_EXT:
             new = c_strip(text, asm=(ext == ".asm"))
+            if ext == ".s":
+                new = line_comment_strip(new, "#", preserve_directives=True)
         elif ext == ".py":
             new = python_strip(text)
         elif ext in XML_EXT:
