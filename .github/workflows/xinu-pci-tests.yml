@@ -26,5 +26,13 @@ jobs:
             XINU/osfmk/device/ossd_pci.c \
             XINU/tests/ossd_pci_scan_test.c \
             -o /tmp/ossd-pci-test
+      - name: Compile x86-64 PCI port-I/O backend
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror \\
+            -D__unused='__attribute__((unused))' \\
+            -I XINU/osfmk \\
+            -I XINU/EXTERNAL_HEADERS/architecture \\
+            -c XINU/osfmk/i386/ossd_pci_x86.c \\
+            -o /tmp/ossd-pci-x86.o
       - name: Run PCI scanner tests
         run: /tmp/ossd-pci-test
