@@ -46,7 +46,7 @@ typedef void (*ossd_pci_config_write_fn)(
 #define OSSD_PCI_COMMAND_ALLOWED_MASK  0x0007U
 
 /*
- * Atomically with respect to the caller's config-space serialization,
+ * With the caller serializing the complete read/modify/write sequence,
  * update only the low 16-bit PCI command register. The high 16-bit status
  * register is written as zero to avoid acknowledging write-one-to-clear
  * status bits. Enable bus mastering only after DMA buffers and mappings are
