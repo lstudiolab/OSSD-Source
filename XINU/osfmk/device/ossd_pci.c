@@ -315,3 +315,120 @@ ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
 	result->prefetchable = prefetch;
 	return 0;
 }
+
+/* PCI BAR mapping and bounded MMIO register access. */
+int
+ossd_pci_map_bar(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device, uint8_t bar_index,
+    uint64_t minimum_length, const struct ossd_pci_mmio_ops *ops,
+    void *map_context, struct ossd_pci_mmio_region *region)
+{
+	struct ossd_pci_bar_info bar;
+	volatile void *mapped = 0;
+	int error;
+
+	if (ops == 0 || ops->map == 0 || ops->unmap == 0 ||
+	    region == 0 || minimum_length == 0) return -1;
+	region->base = 0;
+	region->physical_address = 0;
+	region->length = 0;
+	region->bar_index = 0;
+	error = ossd_pci_size_bar(read_config, write_config, config_context,
+	    device, bar_index, &bar);
+	if (error != 0) return error;
+	if (bar.type != OSSD_PCI_BAR_MEMORY || bar.address == 0 ||
+	    bar.size < minimum_length) return -2;
+	error = ops->map(map_context, bar.address, bar.size, &mapped);
+	if (error != 0) return error;
+	if (mapped == 0) return -3;
+	region->base = (volatile uint8_t *)mapped;
+	region->physical_address = bar.address;
+	region->length = bar.size;
+	region->bar_index = bar_index;
+	return 0;
+}
+
+void
+ossd_pci_unmap_bar(const struct ossd_pci_mmio_ops *ops,
+    void *map_context, struct ossd_pci_mmio_region *region)
+{
+	if (ops == 0 || ops->unmap == 0 || region == 0) return;
+	if (region->base != 0)
+		ops->unmap(map_context, (volatile void *)region->base,
+		    region->length);
+	region->base = 0;
+	region->physical_address = 0;
+	region->length = 0;
+	region->bar_index = 0;
+}
+
+static int
+pci_mmio_valid(const struct ossd_pci_mmio_region *region,
+    uint64_t offset, uint64_t width)
+{
+	return region != 0 && region->base != 0 && width != 0 &&
+	    offset <= region->length && width <= region->length - offset &&
+	    (offset & (width - 1ULL)) == 0;
+}
+
+int
+ossd_pci_mmio_read8(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint8_t *v)
+{
+	if (v == 0 || !pci_mmio_valid(r, o, 1)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*v = *(volatile uint8_t *)(r->base + o);
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
+int
+ossd_pci_mmio_read16(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint16_t *v)
+{
+	if (v == 0 || !pci_mmio_valid(r, o, 2)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*v = *(volatile uint16_t *)(void *)(r->base + o);
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
+int
+ossd_pci_mmio_read32(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint32_t *v)
+{
+	if (v == 0 || !pci_mmio_valid(r, o, 4)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*v = *(volatile uint32_t *)(void *)(r->base + o);
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
+int
+ossd_pci_mmio_write8(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint8_t v)
+{
+	if (!pci_mmio_valid(r, o, 1)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*(volatile uint8_t *)(r->base + o) = v;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
+int
+ossd_pci_mmio_write16(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint16_t v)
+{
+	if (!pci_mmio_valid(r, o, 2)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*(volatile uint16_t *)(void *)(r->base + o) = v;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
+int
+ossd_pci_mmio_write32(const struct ossd_pci_mmio_region *r, uint64_t o,
+    uint32_t v)
+{
+	if (!pci_mmio_valid(r, o, 4)) return -1;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*(volatile uint32_t *)(void *)(r->base + o) = v;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	return 0;
+}
