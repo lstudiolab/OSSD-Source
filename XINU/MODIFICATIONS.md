@@ -25,14 +25,25 @@ source file containing a Modification and requires modified files to carry
 prominent notices stating that the file was changed and the date of change.
 A directory-level notice is not a substitute for those file-level notices.
 
-The current source cleanup changed multiple upstream files. Before publishing
-a redistributed XINU source release, the changed-file set must be reconciled
-against the imported baseline and each affected file must receive a
-syntax-appropriate APSL Exhibit A notice and an accurate modification date.
-Do not invent an earlier date or overwrite an existing copyright notice.
+On 2026-11-24, the repository automation reconciled the source tree against
+the imported baseline and added the dated OSSD modification notice to 2,292
+changed files containing one of the recognized APSL 2.0 file-header forms.
+The script supports both the standard Apple license header and the Apple OS
+Reference license header.
+
+A further 584 changed source files did not contain either recognized APSL
+header form and were deliberately not relabeled as APSL-covered. Their
+upstream license and provenance must be audited individually before a
+redistributed release. A missing APSL marker is not proof that a file is
+unlicensed or that APSL applies to it.
+
+The notice pass does not replace a full component-by-component license audit.
+Do not overwrite original copyright notices or apply APSL notices to code
+governed by a different license.
 
 ## Change log
 
 | Date | Change |
 |---|---|
 | 2026-11-24 | Added OSSD XINU provenance, licensing, and hardware-support documentation. |
+| 2026-11-24 | Added dated OSSD modification notices to 2,292 changed APSL-header source files; 584 files without recognized APSL headers remain for separate license audit. |
