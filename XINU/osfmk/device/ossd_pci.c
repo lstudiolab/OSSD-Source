@@ -173,3 +173,31 @@ ossd_pci_scan_ecam(volatile void *mapped_base,
 	return ossd_pci_scan(pci_ecam_read, &context, region->segment,
 	    region->start_bus, region->end_bus, found, found_context);
 }
+
+/*
+ * Update only PCI command bits. The upper status half is deliberately zeroed
+ * because several status bits are write-one-to-clear.
+ */
+int
+ossd_pci_update_command(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t set_bits,
+    uint16_t clear_bits)
+{
+	uint32_t command_status;
+	uint16_t command;
+
+	if (read_config == 0 || write_config == 0 ||
+	    device >= 32 || function >= 8 ||
+	    ((set_bits | clear_bits) & ~OSSD_PCI_COMMAND_ALLOWED_MASK) != 0 ||
+	    (set_bits & clear_bits) != 0) {
+		return -1;
+	}
+	command_status = read_config(context, bus, device, function, 0x04);
+	if (command_status == PCI_ABSENT) return -2;
+	command = (uint16_t)command_status;
+	command = (uint16_t)((command | set_bits) & (uint16_t)~clear_bits);
+	/* Upper 16 bits are zero to avoid clearing W1C status flags. */
+	write_config(context, bus, device, function, 0x04, command);
+	return 0;
+}
