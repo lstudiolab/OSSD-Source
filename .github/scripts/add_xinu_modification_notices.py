@@ -29,8 +29,12 @@ def main():
             continue
         if MARKER in source:
             continue
-        end_tag = "@APPLE_LICENSE_HEADER_END@"
-        if "@APPLE_LICENSE_HEADER_START@" not in source or end_tag not in source:
+        if "@APPLE_LICENSE_HEADER_START@" in source and "@APPLE_LICENSE_HEADER_END@" in source:
+            end_tag = "@APPLE_LICENSE_HEADER_END@"
+        elif ("@APPLE_OSREFERENCE_LICENSE_HEADER_START@" in source
+              and "@APPLE_OSREFERENCE_LICENSE_HEADER_END@" in source):
+            end_tag = "@APPLE_OSREFERENCE_LICENSE_HEADER_END@"
+        else:
             skipped.append(name)
             continue
         line = " * " + MARKER + "\n"
