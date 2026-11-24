@@ -24,7 +24,9 @@ rtw_is_safe_filename(const char *filename)
 {
 	size_t i;
 
-	if (filename == 0 || filename[0] == '\0') return 0;
+	if (filename == 0 || filename[0] == '\0' ||
+	    (filename[0] == '.' && filename[1] == '\0') ||
+	    (filename[0] == '.' && filename[1] == '.' && filename[2] == '\0')) return 0;
 	for (i = 0; filename[i] != '\0'; i++) {
 		char c = filename[i];
 		if (!((c >= 'a' && c <= 'z') ||
@@ -45,7 +47,13 @@ rtw_has_https_prefix(const char *uri)
 	for (i = 0; i < sizeof(prefix) - 1; i++) {
 		if (uri[i] == '\0' || uri[i] != prefix[i]) return 0;
 	}
-	return uri[i] != '\0';
+	if (uri[i] == '\0' || uri[i] == '/' || uri[i] == '?' ||
+	    uri[i] == '#' || uri[i] == ' ') return 0;
+	for (; uri[i] != '\0' && uri[i] != '/' && uri[i] != '?' &&
+	    uri[i] != '#'; i++) {
+		if (uri[i] == ' ' || uri[i] == '\\') return 0;
+	}
+	return 1;
 }
 
 static int
