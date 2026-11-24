@@ -53,5 +53,25 @@ int main(void)
 	assert(dev.state == OSSD_RTW_STATE_FAILED && dev.last_error == -5);
 	/* claim and reset completed, so failure unwound the claimed bus. */
 	assert(m.calls == 3 + 1000);
+
+	/* A failed start must invoke stop before releasing the transport. */
+	m.calls = 0; m.fail_at = 5;
+	dev.state = OSSD_RTW_STATE_MATCHED;
+	assert(ossd_rtw_device_start(&dev) == -5);
+	assert(dev.state == OSSD_RTW_STATE_FAILED);
+	assert(m.calls == 5 + 100 + 1000);
+
+	/* A missing firmware manifest must fail before claiming hardware. */
+	{
+		struct ossd_rtw_match no_firmware = {
+			OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "chip", 0
+		};
+		dev.match = &no_firmware;
+		m.calls = 0; m.fail_at = 0;
+		dev.state = OSSD_RTW_STATE_MATCHED;
+		assert(ossd_rtw_device_start(&dev) == -3);
+		assert(m.calls == 0);
+		dev.match = &test_match;
+	}
 	return 0;
 }
