@@ -88,6 +88,7 @@ osfmk/kern/kern_stackshot.c	standard
 # OSSD generic PCI configuration-space discovery
 osfmk/device/ossd_pci.c		standard
 osfmk/device/ossd_realtek_wifi.c	standard
+osfmk/device/ossd_realtek_wifi_core.c	standard
 osfmk/kdp/kdp_udp.c			optional mach_kdp
 osfmk/kdp/kdp_core.c			optional mach_kdp
 osfmk/kdp/processor_core.c		optional mach_kdp
