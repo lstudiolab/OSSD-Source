@@ -251,7 +251,7 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 	    (uint32_t)((state->original_command |
 	    PCI_COMMAND_INTERRUPT_DISABLE) & 0xffffU));
 	if (state->has_per_vector_mask) {
-		write_config(config_context, device->bus, device->function,
+		write_config(config_context, device->bus, device->device,
 		    device->function, state->mask_register_offset,
 		    state->original_mask | 1U);
 	}
