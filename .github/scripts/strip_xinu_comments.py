@@ -7,7 +7,7 @@ import tokenize
 
 ROOT = Path("XINU")
 C_EXT = {".c", ".h", ".cc", ".hh", ".cpp", ".hpp", ".cxx", ".hxx",
-         ".m", ".mm", ".inc", ".def", ".ipp", ".tcc", ".java", ".js",
+         ".m", ".mm", ".inc", ".def", ".defs", ".iig", ".d", ".y", ".l", ".pbxproj", ".modulemap", ".cocci", ".ipp", ".tcc", ".java", ".js",
          ".jsx", ".ts", ".tsx", ".swift", ".rs", ".go", ".cs", ".kt"}
 HASH_EXT = {".sh", ".bash", ".zsh", ".py", ".pl", ".pm", ".rb", ".r",
             ".mk", ".mak", ".make", ".yaml", ".yml", ".toml", ".ini",
@@ -53,12 +53,6 @@ def c_strip(src, asm=False):
         if src.startswith("/*", i):
             j = src.find("*/", i + 2)
             j = n if j < 0 else j + 2
-            chunk = src[i:j]
-            out.append(chunk if legal(chunk) else blank(chunk))
-            i = j; continue
-        if asm and src[i] == ";":
-            j = src.find("\n", i)
-            if j < 0: j = n
             chunk = src[i:j]
             out.append(chunk if legal(chunk) else blank(chunk))
             i = j; continue
@@ -123,7 +117,7 @@ def main():
         if ext in C_EXT:
             new = c_strip(text)
         elif ext in ASM_EXT:
-            new = c_strip(text, asm=True)
+            new = c_strip(text, asm=(ext == ".asm"))
         elif ext == ".py":
             new = python_strip(text)
         elif ext in XML_EXT:
