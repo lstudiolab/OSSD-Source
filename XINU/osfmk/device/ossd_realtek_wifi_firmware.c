@@ -92,8 +92,7 @@ ossd_rtw_firmware_validate(
 	if (manifest->revision_min > manifest->revision_max ||
 	    silicon_revision < manifest->revision_min ||
 	    silicon_revision > manifest->revision_max) return -6;
-	if (verify_sha256 == 0) return -7;
-	if (verify_sha256(verify_context, bytes, length,
+	if (ossd_rtw_sha256_verify(0, bytes, length,
 	    manifest->sha256_hex) != 0) return -8;
 	return 0;
 }
