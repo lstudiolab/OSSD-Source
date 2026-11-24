@@ -68,15 +68,21 @@ bits, writing zero to the write-one-to-clear status half. Callers must
 serialize the complete read/modify/write sequence and must not enable bus
 mastering until DMA mappings are ready.
 
-The PCI resource layer now includes an explicit BAR sizing operation and
-firmware-assigned MMIO mapping contract. BAR sizing temporarily disables I/O
-and memory decoding, reads 32-bit or 64-bit size masks, restores BAR registers,
-and restores the PCI command register. It does not assign addresses. BAR
-mapping accepts memory BARs only and delegates mapping attributes to a
-platform callback; the callback must map the range as device memory, not
-cacheable RAM. Bounded 8/16/32-bit MMIO accessors validate alignment and range
-and issue sequentially consistent fences. The caller must serialize BAR sizing
-against all other config-space access.
+The PCI resource layer now includes explicit BAR sizing, firmware-assigned
+MMIO mapping, and portable ECAM configuration read/write callbacks. BAR sizing
+temporarily disables I/O and memory decoding, reads 32-bit or 64-bit size
+masks, restores BAR registers, and restores the PCI command register. It does
+not assign addresses. BAR mapping accepts memory BARs only and delegates
+mapping attributes to a platform callback; the callback must map the range as
+device memory, not cacheable RAM. Bounded 8/16/32-bit MMIO accessors validate
+alignment and range and issue sequentially consistent fences. The caller must
+serialize BAR sizing against all other config-space access.
+
+A platform-neutral DMA provider contract is also implemented. It validates
+contiguous DMA segments against alignment, address-width, and boundary
+constraints; records transfer direction; and requires explicit synchronization
+for CPU/device ownership transitions. Actual physical DMA allocation and cache
+maintenance remain platform-provider responsibilities.
 
 The DMA contract now validates one contiguous device-visible segment against
 alignment, address-width, and no-crossing-boundary constraints. It records
