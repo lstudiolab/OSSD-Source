@@ -58,7 +58,12 @@ configuration scanning is available through the x86-64 mechanism #1 backend
 or a caller-mapped ECAM window. A bounded PCI driver registry now provides
 vendor/device/subsystem/class matching, ordered probe attempts, duplicate
 function rejection, and deterministic remove callbacks. Its tests cover
-matching, failed probes, duplicate attachment, and detach cleanup.
+matching, failed probes, duplicate attachment, and detach cleanup. The x86-64
+configuration-mechanism backend now exposes serialized config reads and writes;
+the command-register helper updates only I/O, memory-decode, and bus-master
+bits, writing zero to the write-one-to-clear status half. Callers must
+serialize the complete read/modify/write sequence and must not enable bus
+mastering until DMA mappings are ready.
 
 The registry is a binding contract only: it does not map BARs, assign bus
 resources, enable bus mastering, allocate DMA, configure MSI/MSI-X, or provide
@@ -73,8 +78,9 @@ association, key management, or radio control.
 
 Before a chipset backend can be considered functional, XINU must provide:
 
-- PCI BAR sizing/assignment, safe MMIO mapping, resource ownership, bus-master
-  control, and a platform-backed device-resource provider.
+- PCI BAR sizing/assignment, safe MMIO mapping, resource ownership, and a
+  platform-backed device-resource provider. The command-register helper exists,
+  but no driver resource allocator currently owns or maps BARs.
 - USB and SDIO enumeration, host-controller transfers, resource assignment,
   and driver binding.
 - Safe BAR/MMIO mapping and USB control/bulk/interrupt transfers.
