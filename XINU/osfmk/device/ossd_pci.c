@@ -128,6 +128,212 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 	return count;
 }
 
+#define PCI_STATUS_CAPABILITIES 0x0010U
+#define PCI_CAPABILITY_MSI 0x05U
+#define PCI_COMMAND_INTERRUPT_DISABLE 0x0400U
+#define PCI_MSI_ENABLE 0x0001U
+#define PCI_MSI_MME_MASK 0x0070U
+#define PCI_MSI_64BIT 0x0080U
+#define PCI_MSI_PER_VECTOR_MASK 0x0100U
+
+static void
+pci_write_msi_control(ossd_pci_config_write_fn write_config, void *context,
+    const struct ossd_pci_device *device, uint8_t capability,
+    uint32_t capability_header, uint16_t control)
+{
+	uint32_t value = (capability_header & 0x0000ffffU) |
+	    ((uint32_t)control << 16);
+	write_config(context, device->bus, device->device, device->function,
+	    capability, value);
+}
+
+static int
+pci_find_msi_capability(ossd_pci_config_read_fn read_config, void *context,
+    const struct ossd_pci_device *device, uint8_t *capability,
+    uint32_t *capability_header)
+{
+	uint32_t status, pointer_reg, pointer;
+	uint8_t visited[64] = { 0 };
+	uint32_t steps;
+
+	status = read_config(context, device->bus, device->device,
+	    device->function, 0x04);
+	if (status == PCI_ABSENT ||
+	    (((status >> 16) & PCI_STATUS_CAPABILITIES) == 0)) return -2;
+	pointer_reg = device->header_type == 2 ? 0x14U : 0x34U;
+	pointer = read_config(context, device->bus, device->device,
+	    device->function, (uint16_t)pointer_reg);
+	pointer = (pointer >> ((pointer_reg & 3U) * 8U)) & 0xffU;
+	for (steps = 0; pointer != 0 && steps < 48; steps++) {
+		uint32_t header;
+		uint32_t index;
+		if (pointer < 0x40U || pointer > 0xfcU ||
+		    (pointer & 3U) != 0) return -3;
+		index = pointer >> 2;
+		if (visited[index] != 0) return -3;
+		visited[index] = 1;
+		header = read_config(context, device->bus, device->device,
+		    device->function, (uint16_t)pointer);
+		if (header == PCI_ABSENT) return -3;
+		if ((header & 0xffU) == PCI_CAPABILITY_MSI) {
+			*capability = (uint8_t)pointer;
+			*capability_header = header;
+			return 0;
+		}
+		pointer = (header >> 8) & 0xffU;
+	}
+	return pointer == 0 ? -4 : -3;
+}
+
+int
+ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device,
+    const struct ossd_pci_msi_provider_ops *provider,
+    void *provider_context, struct ossd_pci_msi_state *state)
+{
+	struct ossd_pci_msi_message message;
+	uint32_t identity, capability_header, command_status;
+	uint16_t control, disabled_control, enabled_control;
+	uint8_t capability;
+	int error;
+
+	if (read_config == 0 || write_config == 0 || device == 0 ||
+	    provider == 0 || provider->allocate == 0 ||
+	    provider->release == 0 || state == 0 ||
+	    device->device >= 32 || device->function >= 8) return -1;
+	if (state->active) return -5;
+	identity = read_config(config_context, device->bus, device->device,
+	    device->function, 0x00);
+	if (identity == PCI_ABSENT || (uint16_t)identity != device->vendor_id ||
+	    (uint16_t)(identity >> 16) != device->device_id) return -2;
+	error = pci_find_msi_capability(read_config, config_context, device,
+	    &capability, &capability_header);
+	if (error != 0) return error;
+
+	control = (uint16_t)(capability_header >> 16);
+	error = provider->allocate(provider_context, &message);
+	if (error != 0) return error;
+	if ((message.address & 3ULL) != 0 || message.data > 0xffffU ||
+	    (((control & PCI_MSI_64BIT) == 0) &&
+	    (message.address >> 32) != 0)) {
+		provider->release(provider_context, &message);
+		return -6;
+	}
+
+	state->message = message;
+	state->original_control = control;
+	state->capability_offset = capability;
+	state->has_per_vector_mask =
+	    (control & PCI_MSI_PER_VECTOR_MASK) != 0;
+	state->mask_register_offset = (uint16_t)(capability +
+	    ((control & PCI_MSI_64BIT) != 0 ? 16U : 12U));
+	state->original_mask = state->has_per_vector_mask ?
+	    read_config(config_context, device->bus, device->device,
+	    device->function, state->mask_register_offset) : 0;
+	command_status = read_config(config_context, device->bus, device->device,
+	    device->function, 0x04);
+	if (command_status == PCI_ABSENT) {
+		provider->release(provider_context, &state->message);
+		state->active = 0;
+		return -2;
+	}
+	state->original_command = (uint16_t)command_status;
+	state->active = 1;
+
+	/* Disable MSI while programming the route; preserve capability flags. */
+	disabled_control = (uint16_t)(control & (uint16_t)~(PCI_MSI_ENABLE |
+	    PCI_MSI_MME_MASK));
+	pci_write_msi_control(write_config, config_context, device, capability,
+	    capability_header, disabled_control);
+	write_config(config_context, device->bus, device->device,
+	    device->function, 0x04,
+	    (uint32_t)((state->original_command |
+	    PCI_COMMAND_INTERRUPT_DISABLE) & 0xffffU));
+	if (state->has_per_vector_mask) {
+		write_config(config_context, device->bus, device->function,
+		    device->function, state->mask_register_offset,
+		    state->original_mask | 1U);
+	}
+	write_config(config_context, device->bus, device->device,
+	    device->function, (uint16_t)(capability + 4U),
+	    (uint32_t)message.address);
+	if ((control & PCI_MSI_64BIT) != 0) {
+		write_config(config_context, device->bus, device->device,
+		    device->function, (uint16_t)(capability + 8U),
+		    (uint32_t)(message.address >> 32));
+		write_config(config_context, device->bus, device->device,
+		    device->function, (uint16_t)(capability + 12U), message.data);
+	} else {
+		write_config(config_context, device->bus, device->device,
+		    device->function, (uint16_t)(capability + 8U), message.data);
+	}
+	enabled_control = (uint16_t)(disabled_control | PCI_MSI_ENABLE);
+	pci_write_msi_control(write_config, config_context, device, capability,
+	    capability_header, enabled_control);
+	if (state->has_per_vector_mask) {
+		write_config(config_context, device->bus, device->device,
+		    device->function, state->mask_register_offset,
+		    state->original_mask & ~1U);
+	}
+	return 0;
+}
+
+void
+ossd_pci_msi_disable(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device,
+    const struct ossd_pci_msi_provider_ops *provider,
+    void *provider_context, struct ossd_pci_msi_state *state)
+{
+	uint32_t header, command_status;
+	uint16_t control;
+
+	if (read_config == 0 || write_config == 0 || device == 0 ||
+	    provider == 0 || provider->release == 0 || state == 0 ||
+	    !state->active) return;
+	header = read_config(config_context, device->bus, device->device,
+	    device->function, state->capability_offset);
+	if (header != PCI_ABSENT) {
+		control = (uint16_t)(header >> 16);
+		if (state->has_per_vector_mask) {
+			write_config(config_context, device->bus, device->device,
+			    device->function, state->mask_register_offset,
+			    state->original_mask | 1U);
+		}
+		/* Leave MSI disabled; do not resurrect a firmware-owned route. */
+		control = (uint16_t)(control & (uint16_t)~(PCI_MSI_ENABLE |
+		    PCI_MSI_MME_MASK));
+		pci_write_msi_control(write_config, config_context, device,
+		    state->capability_offset, header, control);
+		if (state->has_per_vector_mask) {
+			write_config(config_context, device->bus, device->device,
+			    device->function, state->mask_register_offset,
+			    state->original_mask);
+		}
+	}
+	command_status = read_config(config_context, device->bus, device->device,
+	    device->function, 0x04);
+	if (command_status != PCI_ABSENT) {
+		uint16_t command = (uint16_t)command_status;
+		command = (uint16_t)((command & (uint16_t)~PCI_COMMAND_INTERRUPT_DISABLE) |
+		    (state->original_command & PCI_COMMAND_INTERRUPT_DISABLE));
+		write_config(config_context, device->bus, device->device,
+		    device->function, 0x04, command);
+	}
+	provider->release(provider_context, &state->message);
+	state->active = 0;
+	state->has_per_vector_mask = 0;
+	state->capability_offset = 0;
+	state->mask_register_offset = 0;
+	state->original_control = 0;
+	state->original_command = 0;
+	state->original_mask = 0;
+	state->message.address = 0;
+	state->message.data = 0;
+	state->message.provider_cookie = 0;
+}
+
 uint32_t
 ossd_pci_ecam_config_read(void *context, uint8_t bus, uint8_t device,
     uint8_t function, uint16_t offset)
