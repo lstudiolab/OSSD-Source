@@ -53,9 +53,10 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 	if (error != 0) return rtw_fail(device, error);
 	device->state = OSSD_RTW_STATE_INITIALIZED;
 
+	/* Mark before start: a failed start may have partially enabled hardware. */
+	device->started = 1;
 	error = ops->start(device->backend_context);
 	if (error != 0) return rtw_fail(device, error);
-	device->started = 1;
 	device->state = OSSD_RTW_STATE_RUNNING;
 	return 0;
 }
