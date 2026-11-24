@@ -140,8 +140,11 @@ the XINU source tree's applicable licensing obligations.
 
 ### Implemented in the source tree
 
-- A transport-independent PCI function enumerator reads the standard 256-byte
-  configuration header through a supplied configuration-space accessor.
+- A transport-independent PCI function enumerator reads standard configuration
+  headers through a supplied configuration-space accessor.
+- A generic PCIe ECAM scanner supports mapped configuration regions, nonzero
+  segment groups, caller-specified bus ranges, and 4 KiB function configuration
+  spaces. The platform must still discover MCFG/Device Tree regions and map them.
 - The scanner reports vendor/device IDs, class/subclass/programming interface,
   revision, subsystem IDs, header type, interrupt pin/line, and BAR values.
 - It scans all 256 conventional bus numbers and discovers multifunction
@@ -156,19 +159,21 @@ the XINU source tree's applicable licensing obligations.
 
 ### Not yet implemented or verified
 
-- PCIe ECAM configuration-space access and ACPI MCFG/Device Tree host-bridge
-  discovery.
-- An arm64 PCI configuration backend. The generic scanner is portable, but
-  arm64 hardware enumeration is not yet wired to a configuration transport.
+- Platform discovery and mapping of PCIe ECAM regions from ACPI MCFG on x86-64
+  or ACPI/Device Tree host-bridge descriptions on arm64.
+- An arm64 PCI configuration backend and startup integration. The generic ECAM
+  scanner is portable, but arm64 hardware enumeration is not yet wired to a
+  platform-discovered region.
 - BAR sizing/allocation, bridge-window management, PCI resource arbitration,
   MSI/MSI-X setup, IOMMU/DMA integration, and device power management.
 - Driver matching/binding and functional storage, network, audio, USB, display,
   Bluetooth, and input drivers.
 - A complete XINU kernel build, boot test, and physical-hardware test.
 
-The host test validates the generic enumeration algorithm only. It does not
-validate privileged x86 port I/O, the full kernel build, PCIe ECAM, or physical
-hardware. Do not infer device support from the inventory log.
+The host test validates the generic scanner using both a synthetic PCI
+configuration accessor and a synthetic mapped ECAM region. It does not validate
+privileged x86 port I/O, real ACPI/Device Tree discovery, physical MMIO mapping,
+the full kernel build, or physical hardware. Do not infer device support from the inventory log.
 
 The imported XNU-derived source tree provides substantial kernel and I/O Kit
 infrastructure, but this does not establish complete PC driver coverage.
