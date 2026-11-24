@@ -43,13 +43,26 @@ must have its own match record and test status.
   with failure unwind, including stopping partially started hardware. It requires
   a transport/chipset backend to provide every hardware operation. No Realtek
   hardware backend is implemented.
-- The current candidate match records intentionally carry no firmware name.
-  The lifecycle refuses to start without a firmware identifier; this prevents
-  an unverified blob from being selected by a placeholder mapping. A signed or
-  checksummed firmware manifest and per-revision compatibility data are still
-  required.
+- `ossd_realtek_wifi_firmware.c` validates firmware metadata, HTTPS provenance,
+  filename safety, license/redistribution state, chipset family, transport,
+  exact chip name, silicon-revision range, byte length, and SHA-256 through a
+  platform-supplied cryptographic verifier. The lifecycle requires this
+  validation to pass before claiming hardware or loading firmware. No firmware
+  manifest or binary is currently approved for a Realtek chipset.
 
-## Required XINU interfaces
+## Existing XINU primitives and missing interfaces
+
+The source tree contains reusable BSD `ifnet` networking interfaces,
+`IODMACommand` DMA abstractions, and IOKit interrupt event-source APIs. The
+PCI configuration scanner and x86-64 configuration-mechanism backend are also
+present. These are building blocks, not proof that a wireless driver can bind
+or run.
+
+The repository inventory does not currently contain a USB host-controller
+stack, an SDIO host-controller stack, an IOKit PCI device provider/resource
+binding path, an 802.11 management/security framework, or a Realtek chipset
+backend. The BSD network interface APIs do not supply Wi-Fi scanning,
+association, key management, or radio control.
 
 Before a chipset backend can be considered functional, XINU must provide:
 
@@ -64,9 +77,11 @@ Before a chipset backend can be considered functional, XINU must provide:
 - An 802.11 security/control plane covering WPA2/WPA3, key installation,
   roaming, regulatory domain, and user-space supplicant integration.
 
-The current driver roadmap does not establish that these prerequisites exist.
-Do not write a chipset backend against guessed APIs; first define and test the
-interfaces above.
+The firmware validator is a completed safety boundary, but it does not fetch
+firmware, implement SHA-256 itself, or transfer firmware to hardware. The
+platform must supply a cryptographic verifier and a licensed firmware source.
+Do not write a chipset backend against guessed APIs; first implement and test
+the missing bus, resource, and network interfaces above.
 
 ## Bring-up sequence
 
