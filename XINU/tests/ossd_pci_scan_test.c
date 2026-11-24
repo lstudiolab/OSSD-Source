@@ -218,7 +218,11 @@ main(void)
 		bar_mask_high = 0xffffffffU;
 		bar_sizing = 0;
 		bar_writes = 0;
-		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info) == 0);
+		{
+			int bar_result = ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info);
+			if (bar_result != 0) fprintf(stderr, "64-bit BAR sizing returned %d\\n", bar_result);
+			assert(bar_result == 0);
+		}
 		assert(info.type == OSSD_PCI_BAR_MEMORY && info.is_64_bit);
 		assert(info.prefetchable == 1);
 		assert(info.address == 0x1200000000ULL && info.size == 0x1000000ULL);
