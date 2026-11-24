@@ -32,7 +32,8 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 	if (ops->claim == 0 || ops->reset == 0 ||
 	    ops->load_firmware == 0 ||
 	    ops->initialize == 0 || ops->start == 0 || ops->release == 0 ||
-	    ops->stop == 0 || device->firmware == 0 ||
+	    ops->stop == 0 || ops->transmit == 0 || ops->scan == 0 ||
+	    device->firmware == 0 ||
 	    device->firmware_bytes == 0) return -3;
 
 	/* Reject unknown, mismatched, unlicensed, or corrupt blobs before I/O. */
