@@ -1,0 +1,29 @@
+name: XINU PCI discovery tests
+
+on:
+  push:
+    paths:
+      - "XINU/osfmk/device/ossd_pci.*"
+      - "XINU/tests/ossd_pci_scan_test.c"
+      - ".github/workflows/xinu-pci-tests.yml"
+  pull_request:
+    paths:
+      - "XINU/osfmk/device/ossd_pci.*"
+      - "XINU/tests/ossd_pci_scan_test.c"
+      - ".github/workflows/xinu-pci-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  pci-enumeration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile PCI scanner with warnings as errors
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror \
+            -I XINU/osfmk/device \
+            XINU/osfmk/device/ossd_pci.c \
+            XINU/tests/ossd_pci_scan_test.c \
+            -o /tmp/ossd-pci-test
+      - name: Run PCI scanner tests
+        run: /tmp/ossd-pci-test
