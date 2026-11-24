@@ -7,22 +7,6 @@
 #include <string.h>
 #include <device/ossd_realtek_wifi_firmware.h>
 
-static int verify_ok(void *context, const void *bytes, size_t length,
-    const char *digest)
-{
-	(void)context;
-	assert(bytes != 0 && length == 4);
-	assert(strlen(digest) == OSSD_RTW_FIRMWARE_SHA256_HEX_LENGTH);
-	return 0;
-}
-
-static int verify_fail(void *context, const void *bytes, size_t length,
-    const char *digest)
-{
-	(void)context; (void)bytes; (void)length; (void)digest;
-	return -1;
-}
-
 int main(void)
 {
 	const char blob[] = "wifi";
@@ -34,23 +18,27 @@ int main(void)
 		"rtl8821ce.bin", "RTL8821CE",
 		"https://firmware.example.invalid/rtl8821ce.bin",
 		"LicenseRef-UserSupplied",
-		"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+		"debdc6fdb6c19c94ff78b653767bfac108d84ed51a54a58a72866dc635b15729",
 		4, 1, 3, OSSD_RTW_FAMILY_RTW88, OSSD_RTW_TRANSPORT_PCIE,
 		OSSD_RTW_FIRMWARE_USER_SUPPLIED
 	};
 
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
-	    sizeof(blob) - 1, verify_ok, 0) == 0);
+	    sizeof(blob) - 1) == 0);
+	manifest.sha256_hex = "0000000000000000000000000000000000000000000000000000000000000000";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
-	    sizeof(blob) - 1, verify_fail, 0) == -8);
+	    sizeof(blob) - 1) == -8);
+	manifest.sha256_hex = "debdc6fdb6c19c94ff78b653767bfac108d84ed51a54a58a72866dc635b15729";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
-	    sizeof(blob) - 1, 0, 0) == -7);
+	    sizeof(blob) - 1) == -8);
+	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
+	    sizeof(blob) - 1) == -7);
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 4, blob,
-	    sizeof(blob) - 1, verify_ok, 0) == -6);
+	    sizeof(blob) - 1) == -6);
 
 	manifest.filename = "../rtl8821ce.bin";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
-	    sizeof(blob) - 1, verify_ok, 0) == -2);
+	    sizeof(blob) - 1) == -2);
 	manifest.filename = "rtl8821ce.bin";
 	manifest.redistribution = OSSD_RTW_FIRMWARE_PROHIBITED;
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
@@ -63,7 +51,7 @@ int main(void)
 	manifest.sha256_hex = "short";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1, verify_ok, 0) == -2);
-	manifest.sha256_hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+	manifest.sha256_hex = "debdc6fdb6c19c94ff78b653767bfac108d84ed51a54a58a72866dc635b15729";
 	manifest.source_uri = "x";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1, verify_ok, 0) == -2);
