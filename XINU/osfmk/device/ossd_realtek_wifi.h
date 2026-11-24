@@ -19,6 +19,32 @@ enum ossd_rtw_family {
 	OSSD_RTW_FAMILY_RTW89
 };
 
+enum ossd_rtw_transport {
+	OSSD_RTW_TRANSPORT_PCIE = 1,
+	OSSD_RTW_TRANSPORT_USB,
+	OSSD_RTW_TRANSPORT_SDIO
+};
+
+struct ossd_rtw_usb_device {
+	uint16_t vendor_id;
+	uint16_t product_id;
+	uint8_t interface_class;
+	uint8_t interface_subclass;
+	uint8_t interface_protocol;
+};
+
+struct ossd_rtw_sdio_device {
+	uint16_t vendor_id;
+	uint16_t device_id;
+};
+
+struct ossd_rtw_match {
+	enum ossd_rtw_transport transport;
+	enum ossd_rtw_family family;
+	const char *chip_name;
+	const char *firmware_name;
+};
+
 struct ossd_rtw_pci_match {
 	uint16_t vendor_id;
 	uint16_t device_id;
@@ -35,6 +61,10 @@ struct ossd_rtw_pci_match {
 const struct ossd_rtw_pci_match *ossd_rtw_pci_match_device(
     const struct ossd_pci_device *device);
 const char *ossd_rtw_family_name(enum ossd_rtw_family family);
+const struct ossd_rtw_match *ossd_rtw_usb_match_device(
+    const struct ossd_rtw_usb_device *device);
+const struct ossd_rtw_match *ossd_rtw_sdio_match_device(
+    const struct ossd_rtw_sdio_device *device);
 
 #ifdef __cplusplus
 }
