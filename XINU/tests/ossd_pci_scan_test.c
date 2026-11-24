@@ -333,6 +333,9 @@ main(void)
 		msi_config[0x34 / 4] = 0x50U;
 		msi_config[0x50 / 4] = 0x01800005U; /* 64-bit MSI + vector mask */
 		msi_config[0x60 / 4] = 0xa5U;
+		msi_config[0x54 / 4] = 0x11223344U;
+		msi_config[0x58 / 4] = 0x55667788U;
+		msi_config[0x5c / 4] = 0x00000099U;
 		msi_allocations = msi_releases = 0;
 		assert(ossd_pci_msi_enable(msi_read, msi_write, 0, &d,
 		    &provider, 0, &msi_state) == 0);
@@ -348,6 +351,9 @@ main(void)
 		assert(msi_releases == 1 && !msi_state.active);
 		assert((msi_config[0x50 / 4] >> 16 & 1U) == 0U);
 		assert(msi_config[0x60 / 4] == 0xa5U);
+		assert(msi_config[0x54 / 4] == 0x11223344U);
+		assert(msi_config[0x58 / 4] == 0x55667788U);
+		assert(msi_config[0x5c / 4] == 0x00000099U);
 		assert((msi_config[0x04 / 4] & 0xffffU) == 0x0006U);
 	}
 
