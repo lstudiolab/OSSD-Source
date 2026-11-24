@@ -131,6 +131,44 @@ mock_mmio_unmap(void *context, volatile void *virtual_address,
 	mmio_unmap_calls++;
 }
 
+static uint32_t msi_config[1024];
+static int msi_allocations;
+static int msi_releases;
+static uint32_t
+msi_read(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	if (offset >= sizeof(msi_config)) return 0xffffffffU;
+	return msi_config[offset / 4U];
+}
+static void
+msi_write(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset, uint32_t value)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	assert(offset < sizeof(msi_config));
+	msi_config[offset / 4U] = value;
+}
+static int
+msi_allocate(void *context, struct ossd_pci_msi_message *message)
+{
+	(void)context;
+	msi_allocations++;
+	message->address = 0xfee00000ULL;
+	message->data = 0x45U;
+	message->provider_cookie = &msi_config;
+	return 0;
+}
+static void
+msi_release(void *context, const struct ossd_pci_msi_message *message)
+{
+	(void)context;
+	assert(message->address == 0xfee00000ULL);
+	assert(message->data == 0x45U);
+	msi_releases++;
+}
+
 struct test_state {
 	uint32_t count;
 	int found_network;
@@ -269,6 +307,44 @@ main(void)
 		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 6, &info) == -1);
 	}
 
+
+	/* MSI setup programs one routed vector and restores device state on detach. */
+	{
+		const struct ossd_pci_msi_provider_ops provider = {
+			.allocate = msi_allocate, .release = msi_release
+		};
+		struct ossd_pci_device d;
+		struct ossd_pci_msi_state msi_state;
+		memset(&d, 0, sizeof(d));
+		memset(&msi_state, 0, sizeof(msi_state));
+		memset(msi_config, 0, sizeof(msi_config));
+		d.vendor_id = 0x8086;
+		d.device_id = 0x1234;
+		d.device = 1;
+		d.function = 0;
+		d.header_type = 0;
+		msi_config[0x00 / 4] = 0x12348086U;
+		msi_config[0x04 / 4] = 0x00100006U; /* capability list + command */
+		msi_config[0x34 / 4] = 0x50U;
+		msi_config[0x50 / 4] = 0x01800005U; /* 64-bit MSI + vector mask */
+		msi_config[0x60 / 4] = 0xa5U;
+		msi_allocations = msi_releases = 0;
+		assert(ossd_pci_msi_enable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &msi_state) == 0);
+		assert(msi_allocations == 1 && msi_state.active);
+		assert(msi_config[0x54 / 4] == 0xfee00000U);
+		assert(msi_config[0x58 / 4] == 0U);
+		assert(msi_config[0x5c / 4] == 0x45U);
+		assert((msi_config[0x50 / 4] >> 16 & 1U) == 1U);
+		assert(msi_config[0x60 / 4] == 0xa4U);
+		assert((msi_config[0x04 / 4] & 0xffffU) == 0x0406U);
+		ossd_pci_msi_disable(msi_read, msi_write, 0, &d,
+		    &provider, 0, &msi_state);
+		assert(msi_releases == 1 && !msi_state.active);
+		assert((msi_config[0x50 / 4] >> 16 & 1U) == 0U);
+		assert(msi_config[0x60 / 4] == 0xa5U);
+		assert((msi_config[0x04 / 4] & 0xffffU) == 0x0006U);
+	}
 
 	/* BAR mapper and bounded MMIO accessors reject invalid register offsets. */
 	{
