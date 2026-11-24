@@ -72,9 +72,7 @@ ossd_rtw_firmware_validate(
     const struct ossd_rtw_match *match,
     uint16_t silicon_revision,
     const void *bytes,
-    size_t length,
-    ossd_rtw_sha256_verify_fn verify_sha256,
-    void *verify_context)
+    size_t length)
 {
 	if (manifest == 0 || match == 0 || bytes == 0) return -1;
 	if (!rtw_is_safe_filename(manifest->filename) ||
