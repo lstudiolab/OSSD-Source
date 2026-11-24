@@ -92,10 +92,16 @@ provider. The contract is tested, but there is not yet an x86-64 or arm64
 physical DMA allocator/IOMMU provider wired into XCU; therefore this does not
 yet enable Realtek DMA rings or bus mastering.
 
-The registry remains a binding contract: it does not assign BAR addresses,
-allocate DMA, configure MSI/MSI-X, or provide a concrete platform resource
-provider. Registry mutation and device lifecycle calls must currently be
-externally serialized.
+The PCI layer now also discovers the conventional MSI capability and can
+configure or tear down one MSI vector through a platform-supplied vector
+provider. It handles 32-bit and 64-bit MSI messages, optional per-vector
+masking, disables legacy INTx while MSI is active, and restores the original
+INTx-disable and mask state on teardown. The provider must install the
+architecture interrupt route before returning the MSI address/data. MSI-X is
+not implemented. No x86-64 APIC or arm64 GIC vector provider is wired into XCU,
+so this remains a tested configuration contract rather than usable hardware
+interrupt delivery. Registry mutation and device lifecycle calls must
+currently be externally serialized.
 
 The repository inventory does not currently contain a USB host-controller
 stack, an SDIO host-controller stack, an IOKit PCI device provider/resource
@@ -112,7 +118,10 @@ Before a chipset backend can be considered functional, XINU must provide:
 - USB and SDIO enumeration, host-controller transfers, resource assignment,
   and driver binding, including USB control/bulk/interrupt transfers.
 - DMA allocation, mapping, cache maintenance, and teardown.
-- MSI/MSI-X and legacy interrupt registration, synchronization, and teardown.
+- Platform interrupt-vector providers for x86-64 APIC and arm64 GIC, MSI-X,
+  legacy interrupt registration, synchronization, and teardown. One-vector
+  MSI capability programming exists but is not connected to a real vector
+  allocator or interrupt dispatcher.
 - A firmware loader with bounded reads, integrity checks, and provenance.
 - Work queues, timers, locks, reset/recovery, and power-state transitions.
 - A network-device contract for scan results, authentication/association,
