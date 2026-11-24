@@ -18,6 +18,7 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  *
+ *  * OSSD MODIFICATION NOTICE: Modified by OSSD on 2026-11-24.
  * @APPLE_LICENSE_HEADER_END@
  */
 /*-
