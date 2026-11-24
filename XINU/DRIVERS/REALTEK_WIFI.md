@@ -46,10 +46,12 @@ must have its own match record and test status.
 - `ossd_realtek_wifi_firmware.c` validates firmware metadata, HTTPS provenance,
   filename safety, license/redistribution state, chipset family, transport,
   exact chip name, silicon-revision range, byte length, and SHA-256 through
-  an in-tree OSSD SHA-256 implementation. The digest comparison is constant
-  time. The lifecycle requires validation to pass before claiming hardware or
-  loading firmware. No firmware manifest or binary is currently approved for a
-  Realtek chipset.
+  an in-tree OSSD SHA-256 implementation. Tests include standard empty, short,
+  block-boundary, and multi-block known-answer vectors. The digest comparison
+  is constant time. A hash proves that bytes match a trusted manifest; it does
+  not authenticate an untrusted manifest or HTTPS source. The lifecycle
+  requires validation to pass before claiming hardware or loading firmware.
+  No firmware manifest or binary is currently approved for a Realtek chipset.
 
 ## Existing XINU primitives and missing interfaces
 
