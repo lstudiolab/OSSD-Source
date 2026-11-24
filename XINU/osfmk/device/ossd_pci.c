@@ -128,33 +128,49 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 	return count;
 }
 
-struct ossd_pci_ecam_context {
-	volatile uint8_t *base;
-	const struct ossd_pci_ecam_region *region;
-};
-
-static uint32_t
-pci_ecam_read(void *context, uint8_t bus, uint8_t device,
+uint32_t
+ossd_pci_ecam_config_read(void *context, uint8_t bus, uint8_t device,
     uint8_t function, uint16_t offset)
 {
-	struct ossd_pci_ecam_context *ecam =
-	    (struct ossd_pci_ecam_context *)context;
-	uint64_t bus_offset;
-	uint64_t register_offset;
+	struct ossd_pci_ecam_access *ecam =
+	    (struct ossd_pci_ecam_access *)context;
+	uint64_t bus_offset, register_offset;
 	volatile uint32_t *register_address;
 
-	if (ecam == 0 || ecam->base == 0 || ecam->region == 0 ||
+	if (ecam == 0 || ecam->mapped_base == 0 || ecam->region == 0 ||
 	    bus < ecam->region->start_bus || bus > ecam->region->end_bus ||
 	    device >= 32 || function >= 8 || offset >= 4096 ||
-	    (offset & 3) != 0) {
-		return PCI_ABSENT;
-	}
-
+	    (offset & 3) != 0) return PCI_ABSENT;
 	bus_offset = ((uint64_t)(bus - ecam->region->start_bus) << 20);
 	register_offset = bus_offset | ((uint64_t)device << 15) |
 	    ((uint64_t)function << 12) | (uint64_t)offset;
-	register_address = (volatile uint32_t *)(ecam->base + register_offset);
+	register_address = (volatile uint32_t *)(ecam->mapped_base +
+	    register_offset);
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
 	return *register_address;
+}
+
+void
+ossd_pci_ecam_config_write(void *context, uint8_t bus, uint8_t device,
+    uint8_t function, uint16_t offset, uint32_t value)
+{
+	struct ossd_pci_ecam_access *ecam =
+	    (struct ossd_pci_ecam_access *)context;
+	uint64_t bus_offset, register_offset;
+	volatile uint32_t *register_address;
+
+	if (ecam == 0 || ecam->mapped_base == 0 || ecam->region == 0 ||
+	    bus < ecam->region->start_bus || bus > ecam->region->end_bus ||
+	    device >= 32 || function >= 8 || offset >= 4096 ||
+	    (offset & 3) != 0) return;
+	bus_offset = ((uint64_t)(bus - ecam->region->start_bus) << 20);
+	register_offset = bus_offset | ((uint64_t)device << 15) |
+	    ((uint64_t)function << 12) | (uint64_t)offset;
+	register_address = (volatile uint32_t *)(ecam->mapped_base +
+	    register_offset);
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
+	*register_address = value;
+	__atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
 uint32_t
@@ -162,15 +178,16 @@ ossd_pci_scan_ecam(volatile void *mapped_base,
     const struct ossd_pci_ecam_region *region, ossd_pci_device_fn found,
     void *found_context)
 {
-	struct ossd_pci_ecam_context context;
+	struct ossd_pci_ecam_access context;
 
 	if (mapped_base == 0 || region == 0 ||
 	    region->start_bus > region->end_bus) {
 		return 0;
 	}
-	context.base = (volatile uint8_t *)mapped_base;
+	context.mapped_base = (volatile uint8_t *)mapped_base;
 	context.region = region;
-	return ossd_pci_scan(pci_ecam_read, &context, region->segment,
+	context.region = region;
+	return ossd_pci_scan(ossd_pci_ecam_config_read, &context, region->segment,
 	    region->start_bus, region->end_bus, found, found_context);
 }
 
