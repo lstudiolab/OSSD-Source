@@ -34,7 +34,6 @@ enum ossd_rtw_state {
 struct ossd_rtw_backend_ops {
 	int (*claim)(void *context);
 	int (*reset)(void *context);
-	ossd_rtw_sha256_verify_fn verify_firmware;
 	int (*load_firmware)(void *context,
 	    const struct ossd_rtw_firmware_manifest *manifest,
 	    const void *bytes, size_t length);
