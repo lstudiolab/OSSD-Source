@@ -198,6 +198,19 @@ main(void)
 		assert(ossd_pci_scan_ecam(ecam_memory, &region,
 		    record_device, &state) == 1);
 		assert(state.count == 1 && state.found_ecam);
+		{
+			struct ossd_pci_ecam_access access;
+			access.mapped_base = (volatile uint8_t *)ecam_memory;
+			access.region = &region;
+			assert(ossd_pci_ecam_config_read(&access, 5, 4, 0, 0x00) ==
+			    0x1000abcdU);
+			ossd_pci_ecam_config_write(&access, 5, 4, 0, 0x04,
+			    0x00000006U);
+			assert(ossd_pci_ecam_config_read(&access, 5, 4, 0, 0x04) ==
+			    0x00000006U);
+			assert(ossd_pci_ecam_config_read(&access, 6, 4, 0, 0x00) ==
+			    0xffffffffU);
+		}
 	}
 	/* Command writes preserve low bits and never echo W1C status bits. */
 	command_register = 0xa5a50040U;
