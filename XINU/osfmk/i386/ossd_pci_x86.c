@@ -57,3 +57,29 @@ ossd_pci_platform_enumerate(ossd_pci_device_fn found, void *found_context)
 {
 	return ossd_pci_scan(pci_x86_read, 0, 0, 0, 255, found, found_context);
 }
+
+uint32_t
+ossd_pci_platform_config_read(void *context __unused, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset)
+{
+	return pci_x86_read(0, bus, device, function, offset);
+}
+
+void
+ossd_pci_platform_config_write(void *context __unused, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset, uint32_t value)
+{
+	uint32_t address;
+
+	if (device >= 32 || function >= 8 || offset >= 256 ||
+	    (offset & 3) != 0) {
+		return;
+	}
+	address = 0x80000000U | ((uint32_t)bus << 16) |
+	    ((uint32_t)device << 11) | ((uint32_t)function << 8) |
+	    ((uint32_t)offset & 0xfcU);
+	pci_lock();
+	outl((i386_ioport_t)PCI_CONFIG_ADDRESS, address);
+	outl((i386_ioport_t)PCI_CONFIG_DATA, value);
+	pci_unlock();
+}
