@@ -21,6 +21,7 @@ jobs:
       - name: Compile PCI scanner with warnings as errors
         run: |
           cc -std=c11 -Wall -Wextra -Werror \
+            -I XINU/osfmk \
             -I XINU/osfmk/device \
             XINU/osfmk/device/ossd_pci.c \
             XINU/tests/ossd_pci_scan_test.c \
