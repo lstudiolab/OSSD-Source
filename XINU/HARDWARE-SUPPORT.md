@@ -22,17 +22,30 @@ HP's model documentation lists several possible wireless configurations:
 | Realtek RTL8822BE | PCIe Wi-Fi, USB Bluetooth | Not implemented or verified |
 
 The exact adapter installed in the target laptop must be identified by its
-PCI hardware ID. The Intel 9560 is a CNVi device and must not be treated as
-interchangeable with ordinary PCIe Intel WLAN devices. The two Realtek
-adapters require their own chipset-specific initialization, firmware handling,
-and radio/transport support.
+PCI hardware ID and subsystem ID. Candidate identifiers include:
+
+| Adapter | PCI vendor:device | Known HP subsystem IDs | Notes |
+|---|---|---|---|
+| Intel Wireless-AC 9560 | 8086:9df0 | Must be read from the target machine | CNVi; platform-integrated connectivity, not an ordinary PCIe WLAN card |
+| Realtek RTL8821CE | 10ec:c821 (also 10ec:b821 on some revisions) | 103c:831a, 103c:884d | PCIe WLAN; separate chipset/firmware path |
+| Realtek RTL8822BE | 10ec:b822 | 103c:831b, 103c:840b | PCIe WLAN; separate chipset/firmware path |
+
+These IDs are identification candidates, not proof that every listed
+subsystem is installed in every ProBook 450 G6. Match the complete ID from
+the actual laptop before enabling a hardware-specific initialization path.
+The Intel 9560 is a CNVi device and must not be treated as interchangeable
+with ordinary PCIe Intel WLAN devices. The two Realtek adapters require their
+own chipset-specific initialization, firmware handling, and radio/transport
+support.
 
 ## HP ProBook 450 G6: audio
 
 The platform may expose an Intel High Definition Audio or Intel Smart Sound
 Technology (SST) controller and a Realtek codec. A Realtek ALC236 codec ID
-has been reported for some 450 G6 configurations, but the codec and subsystem
-ID for the actual target machine have not yet been verified.
+has been reported for some 450 G6 configurations, but the codec, subsystem
+ID, and Intel audio-controller PCI ID for the actual target machine have not
+yet been verified. Do not bind a driver to ALC236 until the full HDAUDIO ID
+and controller ID are confirmed.
 
 Required coverage includes:
 
@@ -76,7 +89,8 @@ Ids** for:
 1. The Wi-Fi adapter under Network adapters.
 2. The audio controller under System devices or Sound, video and game
    controllers.
-3. The Realtek audio codec, if it appears as a separate device.
+3. The Realtek audio codec, if it appears as a separate device (often an
+   HDAUDIO\\FUNC_01 ID rather than a PCI ID).
 
 Record all returned IDs, not only the first line. This distinguishes the
 actual machine configuration from other ProBook 450 G6 variants.
