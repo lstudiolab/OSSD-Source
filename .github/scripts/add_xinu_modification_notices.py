@@ -28,6 +28,10 @@ def main():
             skipped.append(name)
             continue
         if MARKER in source:
+            corrected = source.replace(" *  * " + MARKER, " * " + MARKER)
+            if corrected != source:
+                path.write_text(corrected, encoding="utf-8", newline="")
+                updated.append(name)
             continue
         if "@APPLE_LICENSE_HEADER_START@" in source and "@APPLE_LICENSE_HEADER_END@" in source:
             end_tag = "@APPLE_LICENSE_HEADER_END@"
