@@ -16,7 +16,7 @@ XML_EXT = {".xml", ".plist", ".html", ".htm", ".xhtml", ".svg"}
 ASM_EXT = {".s", ".asm"}
 LEGAL = re.compile(r"(SPDX-License-Identifier|Copyright|著作権|Apple Public Source License|"
                    r"APPLE PUBLIC SOURCE LICENSE|All rights reserved|Redistribution and use|"
-                   r"Licensed under|This file is part of)", re.I)
+                   r"Licensed under|This file is part of|OSSD MODIFICATION NOTICE)", re.I)
 
 def legal(s):
     return bool(LEGAL.search(s))
