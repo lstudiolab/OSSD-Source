@@ -289,9 +289,7 @@ ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
 	    device->function, 0x04, command_status & 0xffffU);
 	(void)restore_error;
 
-	if (mask_low == PCI_ABSENT || (is_64 && mask_high == PCI_ABSENT))
-		return -2;
-
+	/* All-ones is a valid upper mask for many 64-bit BARs. */
 	if (type == OSSD_PCI_BAR_IO) {
 		mask = (uint64_t)(mask_low & ~3U);
 		size = ((~mask) & 0xffffffffULL) + 1ULL;
