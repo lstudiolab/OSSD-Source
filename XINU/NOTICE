@@ -1,0 +1,44 @@
+XINU — OSSD NOTICE
+==================
+
+XINU is an independent, modified kernel project for the Open Source System
+Distribution (OSSD).
+
+UPSTREAM ORIGIN
+---------------
+The XINU source tree includes code derived from Apple's published XNU source.
+The upstream source was imported from:
+https://github.com/lstudiolab/darwin-xnu
+
+The XNU-derived covered code is distributed under the Apple Public Source
+License, Version 2.0 (APSL 2.0). The complete license text is in this
+directory's LICENSE file. Original copyright, attribution, and license
+notices in source files remain applicable.
+
+MODIFICATION NOTICE
+-------------------
+This is not an unmodified copy of XNU. The imported source has been changed
+for OSSD, including source cleanup and OSSD-specific integration work.
+Modified source files must carry the modification and date notices required
+by APSL 2.0, Section 2.2(b), together with the applicable Exhibit A notice.
+See MODIFICATIONS.md for the OSSD change record.
+
+INDEPENDENCE
+------------
+OSSD and XINU are not affiliated with, sponsored by, or endorsed by Apple.
+Apple, XNU, macOS, and other third-party names are used only to identify
+origin or compatibility context. Their respective owners retain their marks.
+
+OPEN DEVELOPMENT
+----------------
+OSSD is developed as a publicly inspectable source project. Contributions
+must identify provenance, preserve upstream license terms, and document
+third-party code and firmware. The license attached to each component
+continues to govern that component; this notice does not relicense upstream
+code or override any source-file license.
+
+HARDWARE COMPATIBILITY
+----------------------
+Hardware support is an ongoing engineering goal. A device must not be
+advertised as supported until its driver is integrated, build-validated, and
+tested on physical hardware. See HARDWARE-SUPPORT.md.
