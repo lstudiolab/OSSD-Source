@@ -29,7 +29,8 @@ int main(void)
 	const struct ossd_rtw_backend_ops ops = {
 		claim, reset, firmware, initialize, start, stop, release, transmit, scan
 	};
-	struct ossd_rtw_device dev = { um, &ops, &m, OSSD_RTW_STATE_MATCHED, 0 };
+	const struct ossd_rtw_match test_match = { OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "test-chip", "test-firmware.bin" };
+	struct ossd_rtw_device dev = { &test_match, &ops, &m, OSSD_RTW_STATE_MATCHED, 0, 0, 0 };
 	char frame[64] = { 0 };
 
 	assert(um && um->family == OSSD_RTW_FAMILY_RTW88);
