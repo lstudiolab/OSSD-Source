@@ -11,7 +11,6 @@
 #define PCI_INTERRUPT 0x3c
 #define PCI_BAR0 0x10
 #define PCI_BAR_COUNT 6
-#define PCI_MAX_BUSES 256
 #define PCI_MAX_DEVICES 32
 #define PCI_MAX_FUNCTIONS 8
 #define PCI_ABSENT 0xffffffffU
@@ -20,7 +19,7 @@ static uint32_t
 pci_read(ossd_pci_config_read_fn read_config, void *context,
     uint8_t bus, uint8_t device, uint8_t function, uint16_t offset)
 {
-	if (read_config == 0 || (offset & 3) != 0 || offset >= 256) {
+	if (read_config == 0 || (offset & 3) != 0 || offset >= 4096) {
 		return PCI_ABSENT;
 	}
 	return read_config(context, bus, device, function, offset);
@@ -33,7 +32,7 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 	uint32_t count = 0;
 	uint32_t bus;
 
-	if (read_config == 0) {
+	if (read_config == 0 || first_bus > last_bus) {
 		return 0;
 	}
 
@@ -43,7 +42,7 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 	 * Reads are side-effect-free; this routine deliberately does not size
 	 * BARs, enable bus mastering, or alter bridge windows.
 	 */
-	for (bus = 0; bus < PCI_MAX_BUSES; bus++) {
+	for (bus = first_bus; bus <= last_bus; bus++) {
 		uint32_t slot;
 
 		for (slot = 0; slot < PCI_MAX_DEVICES; slot++) {
@@ -90,6 +89,7 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 				    (uint8_t)bus, (uint8_t)slot,
 				    (uint8_t)function, PCI_INTERRUPT);
 
+				info.segment = segment;
 				info.bus = (uint8_t)bus;
 				info.device = (uint8_t)slot;
 				info.function = (uint8_t)function;
@@ -125,4 +125,50 @@ ossd_pci_scan(ossd_pci_config_read_fn read_config, void *read_context,
 		}
 	}
 	return count;
+}
+
+struct ossd_pci_ecam_context {
+	volatile uint8_t *base;
+	const struct ossd_pci_ecam_region *region;
+};
+
+static uint32_t
+pci_ecam_read(void *context, uint8_t bus, uint8_t device,
+    uint8_t function, uint16_t offset)
+{
+	struct ossd_pci_ecam_context *ecam =
+	    (struct ossd_pci_ecam_context *)context;
+	uint64_t bus_offset;
+	uint64_t register_offset;
+	volatile uint32_t *register_address;
+
+	if (ecam == 0 || ecam->base == 0 || ecam->region == 0 ||
+	    bus < ecam->region->start_bus || bus > ecam->region->end_bus ||
+	    device >= 32 || function >= 8 || offset >= 4096 ||
+	    (offset & 3) != 0) {
+		return PCI_ABSENT;
+	}
+
+	bus_offset = ((uint64_t)(bus - ecam->region->start_bus) << 20);
+	register_offset = bus_offset | ((uint64_t)device << 15) |
+	    ((uint64_t)function << 12) | (uint64_t)offset;
+	register_address = (volatile uint32_t *)(ecam->base + register_offset);
+	return *register_address;
+}
+
+uint32_t
+ossd_pci_scan_ecam(volatile void *mapped_base,
+    const struct ossd_pci_ecam_region *region, ossd_pci_device_fn found,
+    void *found_context)
+{
+	struct ossd_pci_ecam_context context;
+
+	if (mapped_base == 0 || region == 0 ||
+	    region->start_bus > region->end_bus) {
+		return 0;
+	}
+	context.base = (volatile uint8_t *)mapped_base;
+	context.region = region;
+	return ossd_pci_scan(pci_ecam_read, &context, region->segment,
+	    region->start_bus, region->end_bus, found, found_context);
 }
