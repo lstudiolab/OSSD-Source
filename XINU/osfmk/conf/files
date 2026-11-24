@@ -84,6 +84,9 @@ osfmk/UserNotification/KUNCUserNotifications.c	standard
 
 osfmk/kdp/kdp.c			optional config_kdp_interactive_debugging
 osfmk/kern/kern_stackshot.c	standard
+
+# OSSD generic PCI configuration-space discovery
+osfmk/device/ossd_pci.c		standard
 osfmk/kdp/kdp_udp.c			optional mach_kdp
 osfmk/kdp/kdp_core.c			optional mach_kdp
 osfmk/kdp/processor_core.c		optional mach_kdp
