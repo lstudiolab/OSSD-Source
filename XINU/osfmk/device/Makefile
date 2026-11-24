@@ -12,7 +12,7 @@ MIG_DEFS =	\
 MIG_HDRS = \
 
 DATAFILES = \
-	device_types.h device_port.h device_types.defs ossd_pci.h ossd_realtek_wifi.h \
+	device_types.h device_port.h device_types.defs ossd_pci.h ossd_realtek_wifi.h ossd_realtek_wifi_core.h \
 	${MIG_DEFS}
 
 PRIVATE_DATAFILES = \
