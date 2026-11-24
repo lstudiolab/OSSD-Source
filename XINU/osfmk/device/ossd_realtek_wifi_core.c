@@ -7,14 +7,12 @@
 static int
 rtw_fail(struct ossd_rtw_device *device, int error)
 {
-	if (device->ops->stop != 0 &&
-	    device->state >= OSSD_RTW_STATE_INITIALIZED) {
+	if (device->started && device->ops->stop != 0)
 		device->ops->stop(device->backend_context);
-	}
-	if (device->ops->release != 0 &&
-	    device->state >= OSSD_RTW_STATE_CLAIMED) {
+	if (device->claimed && device->ops->release != 0)
 		device->ops->release(device->backend_context);
-	}
+	device->started = 0;
+	device->claimed = 0;
 	device->state = OSSD_RTW_STATE_FAILED;
 	device->last_error = error;
 	return error;
@@ -39,6 +37,7 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 	device->last_error = 0;
 	error = ops->claim(device->backend_context);
 	if (error != 0) return rtw_fail(device, error);
+	device->claimed = 1;
 	device->state = OSSD_RTW_STATE_CLAIMED;
 
 	error = ops->reset(device->backend_context);
@@ -56,6 +55,7 @@ ossd_rtw_device_start(struct ossd_rtw_device *device)
 
 	error = ops->start(device->backend_context);
 	if (error != 0) return rtw_fail(device, error);
+	device->started = 1;
 	device->state = OSSD_RTW_STATE_RUNNING;
 	return 0;
 }
@@ -64,14 +64,14 @@ void
 ossd_rtw_device_stop(struct ossd_rtw_device *device)
 {
 	if (device == 0 || device->ops == 0) return;
-	if (device->state >= OSSD_RTW_STATE_INITIALIZED &&
-	    device->ops->stop != 0) {
+	if (device->started && device->ops->stop != 0) {
 		device->ops->stop(device->backend_context);
 	}
-	if (device->state >= OSSD_RTW_STATE_CLAIMED &&
-	    device->ops->release != 0) {
+	if (device->claimed && device->ops->release != 0) {
 		device->ops->release(device->backend_context);
 	}
+	device->started = 0;
+	device->claimed = 0;
 	device->state = OSSD_RTW_STATE_DETACHED;
 	device->last_error = 0;
 }
