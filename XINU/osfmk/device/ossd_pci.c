@@ -186,7 +186,6 @@ ossd_pci_scan_ecam(volatile void *mapped_base,
 	}
 	context.mapped_base = (volatile uint8_t *)mapped_base;
 	context.region = region;
-	context.region = region;
 	return ossd_pci_scan(ossd_pci_ecam_config_read, &context, region->segment,
 	    region->start_bus, region->end_bus, found, found_context);
 }
@@ -237,9 +236,16 @@ ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
 	uint64_t address, mask, size;
 	uint8_t bar_count, is_64 = 0, type, prefetch = 0, i;
 
+	uint32_t identity;
+
 	if (read_config == 0 || write_config == 0 || device == 0 ||
 	    result == 0 || device->device >= 32 || device->function >= 8)
 		return -1;
+	/* Reject absent or stale device records before writing any BAR register. */
+	identity = read_config(context, device->bus, device->device,
+	    device->function, PCI_VENDOR_DEVICE);
+	if (identity == PCI_ABSENT || (uint16_t)identity != device->vendor_id ||
+	    (uint16_t)(identity >> 16) != device->device_id) return -2;
 
 	bar_count = device->header_type == 0 ? 6U :
 	    (device->header_type == 1 ? 2U : 0U);
@@ -394,7 +400,8 @@ pci_mmio_valid(const struct ossd_pci_mmio_region *region,
 {
 	return region != 0 && region->base != 0 && width != 0 &&
 	    offset <= region->length && width <= region->length - offset &&
-	    (offset & (width - 1ULL)) == 0;
+	    (offset & (width - 1ULL)) == 0 &&
+	    (((uintptr_t)region->base & (uintptr_t)(width - 1ULL)) == 0);
 }
 
 int
