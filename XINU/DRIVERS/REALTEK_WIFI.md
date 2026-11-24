@@ -35,16 +35,19 @@ must have its own match record and test status.
   rejects non-network PCI class devices. Subsystem wildcard support is present.
 - The module is included in the Mach source manifest and exported device
   headers. A host regression test checks positive and negative matches.
-- PCIe, USB, and SDIO candidate-identification APIs and match tables are present.
+- PCIe, USB, and SDIO candidate-identification APIs and provisional match tables are present.
   USB matching checks the vendor-specific interface tuple; SDIO matching checks
-  the Realtek SDIO vendor/device pair. IDs identify candidates only.
+  the Realtek SDIO vendor/device pair. IDs identify candidates only and are not a complete vendor hardware database.
 - `ossd_realtek_wifi_core.c` provides a transactional lifecycle contract
   (claim, reset, firmware handoff, initialize, start, stop, transmit, scan)
-  with failure unwind. It requires a transport/chipset backend to provide every
-  hardware operation. No Realtek hardware backend is implemented.
-- Firmware names remain unset until exact chip/revision firmware provenance,
-  checksums, and redistribution terms are verified. The lifecycle refuses to
-  start without a verified firmware identifier.
+  with failure unwind, including stopping partially started hardware. It requires
+  a transport/chipset backend to provide every hardware operation. No Realtek
+  hardware backend is implemented.
+- The current candidate match records intentionally carry no firmware name.
+  The lifecycle refuses to start without a firmware identifier; this prevents
+  an unverified blob from being selected by a placeholder mapping. A signed or
+  checksummed firmware manifest and per-revision compatibility data are still
+  required.
 
 ## Required XINU interfaces
 
