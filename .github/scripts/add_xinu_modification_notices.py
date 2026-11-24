@@ -41,8 +41,7 @@ def main():
         else:
             skipped.append(name)
             continue
-        line = " * " + MARKER + "\n"
-        source = source.replace(end_tag, line + " * " + end_tag, 1)
+        source = source.replace(end_tag, MARKER + "\n * " + end_tag, 1)
         path.write_text(source, encoding="utf-8", newline="")
         updated.append(name)
     print(f"Added dated OSSD notices to {len(updated)} APSL-covered files.")
