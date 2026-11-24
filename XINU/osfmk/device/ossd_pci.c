@@ -302,8 +302,8 @@ ossd_pci_msi_disable(ossd_pci_config_read_fn read_config,
 			    state->original_mask | 1U);
 		}
 		/* Leave MSI disabled; do not resurrect a firmware-owned route. */
-		control = (uint16_t)(control & (uint16_t)~(PCI_MSI_ENABLE |
-		    PCI_MSI_MME_MASK));
+		control = (uint16_t)(state->original_control &
+		    (uint16_t)~(PCI_MSI_ENABLE | PCI_MSI_MME_MASK));
 		pci_write_msi_control(write_config, config_context, device,
 		    state->capability_offset, header, control);
 		if (state->has_per_vector_mask) {
