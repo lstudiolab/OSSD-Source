@@ -22,6 +22,9 @@ enum ossd_dma_direction {
  * One contiguous device-visible DMA segment. Provider implementations must
  * return memory with the requested alignment, address-width and boundary
  * constraints, and must implement cache maintenance in the sync callbacks.
+ * If allocate returns an error, it must release any partial allocation itself.
+ * If it returns success, it transfers ownership to the caller even when the
+ * returned mapping later fails validation; the wrapper then calls release.
  */
 struct ossd_dma_mapping {
 	void *cpu_address;
