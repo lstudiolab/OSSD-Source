@@ -35,6 +35,27 @@ struct ossd_pci_device {
 typedef uint32_t (*ossd_pci_config_read_fn)(
     void *context, uint8_t bus, uint8_t device, uint8_t function,
     uint16_t offset);
+typedef void (*ossd_pci_config_write_fn)(
+    void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset, uint32_t value);
+
+/* PCI command-register bits accepted by ossd_pci_update_command(). */
+#define OSSD_PCI_COMMAND_IO_SPACE       0x0001U
+#define OSSD_PCI_COMMAND_MEMORY_SPACE   0x0002U
+#define OSSD_PCI_COMMAND_BUS_MASTER     0x0004U
+#define OSSD_PCI_COMMAND_ALLOWED_MASK  0x0007U
+
+/*
+ * Atomically with respect to the caller's config-space serialization,
+ * update only the low 16-bit PCI command register. The high 16-bit status
+ * register is written as zero to avoid acknowledging write-one-to-clear
+ * status bits. Enable bus mastering only after DMA buffers and mappings are
+ * ready. Returns 0 on success, negative on invalid access/input.
+ */
+int ossd_pci_update_command(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t set_bits,
+    uint16_t clear_bits);
 struct ossd_pci_ecam_region {
 	uint64_t base_address;
 	uint16_t segment;
@@ -67,6 +88,10 @@ uint32_t ossd_pci_scan_ecam(volatile void *mapped_base,
 /* x86 legacy PCI Configuration Mechanism #1 backend. */
 uint32_t ossd_pci_platform_enumerate(ossd_pci_device_fn found,
     void *found_context);
+uint32_t ossd_pci_platform_config_read(void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset);
+void ossd_pci_platform_config_write(void *context, uint8_t bus,
+    uint8_t device, uint8_t function, uint16_t offset, uint32_t value);
 #endif
 
 #ifdef __cplusplus
