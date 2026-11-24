@@ -10,13 +10,6 @@ struct mock { int calls; int fail_at; };
 static int step(struct mock *m) { m->calls++; return m->calls == m->fail_at ? -5 : 0; }
 static int claim(void *p) { return step(p); }
 static int reset(void *p) { return step(p); }
-static int verify(void *p, const void *bytes, size_t length, const char *digest)
-{
-	(void)p;
-	assert(bytes != 0 && length == 4);
-	assert(strlen(digest) == OSSD_RTW_FIRMWARE_SHA256_HEX_LENGTH);
-	return 0;
-}
 static int firmware(void *p, const struct ossd_rtw_firmware_manifest *manifest,
     const void *bytes, size_t length)
 {
@@ -39,7 +32,7 @@ int main(void)
 	const struct ossd_rtw_match *sm = ossd_rtw_sdio_match_device(&sdio);
 	struct mock m = { 0, 0 };
 	const struct ossd_rtw_backend_ops ops = {
-		.claim = claim, .reset = reset, .verify_firmware = verify,
+		.claim = claim, .reset = reset,
 		.load_firmware = firmware, .initialize = initialize, .start = start,
 		.stop = stop, .release = release, .transmit = transmit, .scan = scan
 	};
@@ -51,7 +44,7 @@ int main(void)
 		"test-firmware.bin", "test-chip",
 		"https://firmware.example.invalid/test-firmware.bin",
 		"LicenseRef-UserSupplied",
-		"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+		"fa2c8cc4f28176bbeed4b736df569a34c79cd3723e9ec42f9674b4d46ac6b8b8",
 		4, 1, 3, OSSD_RTW_FAMILY_RTW88, OSSD_RTW_TRANSPORT_USB,
 		OSSD_RTW_FIRMWARE_USER_SUPPLIED
 	};
@@ -100,18 +93,6 @@ int main(void)
 		assert(ossd_rtw_device_start(&dev) == -3);
 		assert(m.calls == 0);
 		dev.firmware = saved;
-	}
-	/* Digest rejection must also happen before hardware ownership. */
-	{
-		const struct ossd_rtw_backend_ops *saved = dev.ops;
-		struct ossd_rtw_backend_ops bad_ops = ops;
-		bad_ops.verify_firmware = 0;
-		dev.ops = &bad_ops;
-		m.calls = 0; m.fail_at = 0;
-		dev.state = OSSD_RTW_STATE_MATCHED;
-		assert(ossd_rtw_device_start(&dev) == -3);
-		assert(m.calls == 0);
-		dev.ops = saved;
 	}
 	return 0;
 }
