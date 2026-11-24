@@ -195,6 +195,7 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 	struct ossd_pci_msi_message message;
 	uint32_t identity, capability_header, command_status;
 	uint16_t control, disabled_control, enabled_control;
+	uint16_t address_high_offset, data_offset;
 	uint8_t capability;
 	int error;
 
@@ -231,6 +232,26 @@ ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
 	state->original_mask = state->has_per_vector_mask ?
 	    read_config(config_context, device->bus, device->device,
 	    device->function, state->mask_register_offset) : 0;
+	address_high_offset = (uint16_t)(capability + 8U);
+	data_offset = (uint16_t)(capability +
+	    ((control & PCI_MSI_64BIT) != 0 ? 12U : 8U));
+	if (((control & PCI_MSI_64BIT) != 0 &&
+	    (state->has_per_vector_mask ? capability > 0xecU : capability > 0xf0U)) ||
+	    ((control & PCI_MSI_64BIT) == 0 &&
+	    (state->has_per_vector_mask ? capability > 0xf0U : capability > 0xf4U))) {
+		provider->release(provider_context, &state->message);
+		state->message.address = 0;
+		state->message.data = 0;
+		state->message.provider_cookie = 0;
+		return -7;
+	}
+	state->original_address_low = read_config(config_context, device->bus,
+	    device->device, device->function, (uint16_t)(capability + 4U));
+	state->original_address_high = (control & PCI_MSI_64BIT) != 0 ?
+	    read_config(config_context, device->bus, device->device,
+	    device->function, address_high_offset) : 0;
+	state->original_data = read_config(config_context, device->bus,
+	    device->device, device->function, data_offset);
 	command_status = read_config(config_context, device->bus, device->device,
 	    device->function, 0x04);
 	if (command_status == PCI_ABSENT) {
@@ -303,9 +324,21 @@ ossd_pci_msi_disable(ossd_pci_config_read_fn read_config,
 		}
 		/* Leave MSI disabled; do not resurrect a firmware-owned route. */
 		control = (uint16_t)(state->original_control &
-		    (uint16_t)~(PCI_MSI_ENABLE | PCI_MSI_MME_MASK));
+		    (uint16_t)~PCI_MSI_ENABLE);
 		pci_write_msi_control(write_config, config_context, device,
 		    state->capability_offset, header, control);
+		write_config(config_context, device->bus, device->device,
+		    device->function, (uint16_t)(state->capability_offset + 4U),
+		    state->original_address_low);
+		if ((state->original_control & PCI_MSI_64BIT) != 0) {
+			write_config(config_context, device->bus, device->device,
+			    device->function, (uint16_t)(state->capability_offset + 8U),
+			    state->original_address_high);
+		}
+		write_config(config_context, device->bus, device->device,
+		    device->function, (uint16_t)(state->capability_offset +
+		    ((state->original_control & PCI_MSI_64BIT) != 0 ? 12U : 8U)),
+		    state->original_data);
 		if (state->has_per_vector_mask) {
 			write_config(config_context, device->bus, device->device,
 			    device->function, state->mask_register_offset,
@@ -329,6 +362,9 @@ ossd_pci_msi_disable(ossd_pci_config_read_fn read_config,
 	state->original_control = 0;
 	state->original_command = 0;
 	state->original_mask = 0;
+	state->original_address_low = 0;
+	state->original_address_high = 0;
+	state->original_data = 0;
 	state->message.address = 0;
 	state->message.data = 0;
 	state->message.provider_cookie = 0;
