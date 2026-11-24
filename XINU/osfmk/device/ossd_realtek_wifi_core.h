@@ -47,6 +47,8 @@ struct ossd_rtw_device {
 	const struct ossd_rtw_backend_ops *ops;
 	void *backend_context;
 	enum ossd_rtw_state state;
+	uint8_t claimed;
+	uint8_t started;
 	int last_error;
 };
 
