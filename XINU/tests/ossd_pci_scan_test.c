@@ -83,7 +83,7 @@ main(void)
 	uint32_t count;
 
 	memset(&state, 0, sizeof(state));
-	count = ossd_pci_scan(mock_read, NULL, record_device, &state);
+	count = ossd_pci_scan(mock_read, NULL, 0, 0, 255, record_device, &state);
 	assert(count == 3);
 	assert(state.count == 3);
 	assert(state.found_network);
