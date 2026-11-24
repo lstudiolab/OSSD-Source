@@ -19,8 +19,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore pristine imported source before normalization
-        run: git checkout 5b4847b4d910bf78733454c9f4d161f062d953d1 -- XINU
       - name: Remove non-legal source comments
         run: python3 .github/scripts/strip_xinu_comments.py
       - name: Commit cleaned source
